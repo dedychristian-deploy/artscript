@@ -1,0 +1,117 @@
+dim cmd, namaProgram as string
+dim i as integer
+
+
+sub metropagi()
+	for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_PAGI;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_PAGI;")
+	next
+end sub
+
+sub metrokini()
+	for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_KINI;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_KINI;")
+	next
+end sub
+
+sub metrosiang()
+	for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SIANG;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SIANG;")
+	next
+end sub
+
+
+sub metrosore()
+	for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SORE;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SORE;")
+	next
+end sub
+
+sub metrohariini()
+for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_HARI_INI;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_HARI_INI;")
+	next
+end sub
+
+sub topnews()
+for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TOP_NEWS;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TOP_NEWS;")
+	next
+end sub
+
+sub metromalam()
+
+
+for i=1 to 3
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_IN_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_MALAM;")
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET " & i &"_BAR_KIRI_WARNA = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_MALAM;")
+	next
+	
+'cmd = "RENDERER*FUNCTION*DataPool*Data SET CG1_WARNA_PROGRAM1 = MATERIAL MATERIAL*50-ON-AIR/CG_2015_JUNI/ASDF;"
+'	SendCommand(cmd)
+'	cmd = "RENDERER*FUNCTION*DataPool*Data SET CG1_WARNA_PROGRAM2 = MATERIAL MATERIAL*50-ON-AIR/CG_2015_JUNI/ASDF;"
+'	SendCommand(cmd)
+'	println "metromalam"
+	
+
+end sub
+
+
+sub OnLButtonUp()
+
+ceknamaprogram()
+'namaProgram = System.map["NAMA_PROGRAM"] 
+'println "nama program = " &  System.map["NAMA_PROGRAM"] 
+'if namaProgram = "METRO PAGI" then
+'Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+'else
+'Scene.FindContainer("JUDULNYA").geometry.text = "I DONT KNOW"
+'end if
+'
+'println "nama program = " &  System.map["NAMA_PROGRAM"] 
+end sub
+
+sub OnLButtonDown()
+end sub
+
+
+sub ceknamaprogram()
+namaProgram = System.map["NAMA_PROGRAM"]
+if namaProgram = "METRO PAGI" then
+	metropagi()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+elseif namaProgram = "METRO KINI" then
+	metrokini()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+elseif namaProgram = "METRO SIANG" then
+	metrosiang()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+elseif namaProgram = "METRO SORE" then
+	metrosore()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+		
+elseif namaProgram = "METRO HARI INI" then
+	metrohariini()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+elseif namaProgram = "TOP NEWS" then
+	topnews()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+elseif namaProgram = "METRO MALAM" then
+	metromalam()
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+	
+	else
+	Scene.FindContainer("JUDULNYA").geometry.text = namaProgram
+end if
+end sub

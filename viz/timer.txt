@@ -1,0 +1,288 @@
+dim MenitCountDown_li, DetikCountDown_li as integer
+dim StatusTitikDua_lb as boolean = true
+
+dim ContainerMenit_lc, ContainerDetik_lc as Container
+
+dim MenitPeringatanSatu_li, DetikPeringatanSatu_li as Integer
+dim MenitPeringatanDua_li, DetikPeringatanDua_li as Integer
+dim MenitPeringatanTiga_li, DetikPeringatanTiga_li as Integer
+dim MenitPeringatanAkhir_li, DetikPeringatanAkhir_li as Integer
+
+dim SuaraMenitPeringatanSatu_lc, SuaraDetikPeringatanSatu_lc as container
+dim SuaraMenitPeringatanDua_lc, SuaraDetikPeringatanDua_lc as container
+dim SuaraMenitPeringatanTiga_lc, SuaraDetikPeringatanTiga_lc as container
+dim SuaraMenitPeringatanAkhir_lc, SuaraDetikPeringatanAkhir_lc as container
+
+dim WAKTU as DateTime
+dim DETIK as integer
+dim StatusTimer_lb, StatusSeparator_lb as boolean
+dim DetikSaatIni_li, DetikLama_li as integer
+dim cmd_ls as string
+
+dim VizLayerArray_ls As Array[String]
+dim SelectedVizLayer_li As Integer
+
+Function ManipulasiDetik(detik_awal as integer, detik_berjalan as integer, batas_detik as integer) as integer
+		if detik_awal = 0 then
+			detik_awal = detik_berjalan
+		end if
+End function
+
+sub OnInitParameters()
+
+	VizLayerArray_ls.Push("FRONT_LAYER")
+	VizLayerArray_ls.Push("MIDDLE_LAYER")	
+	VizLayerArray_ls.Push("BACK_LAYER")	
+	RegisterRadioButton("VizLayer", "Viz Layer", 0, VizLayerArray_ls)	
+	SelectedVizLayer_li = 0
+	
+	RegisterParameterBool("StatusTimer","StatusTimer", False)
+
+	'paramater untuk CountDown
+	RegisterParameterInt("Menit","Menit",0,0,60)
+	RegisterParameterInt("Detik","Detik",0,0,59)
+	RegisterParameterContainer("ContainerMenit", "Menit")
+	RegisterParameterContainer("ContainerTitikDua", "Separator Titik Dua (:)")
+	RegisterParameterContainer("ContainerDetik", "Detik")
+
+	'parameter untuk suara peringatan pertama
+	RegisterParameterInt("MenitPeringatanSatu","MenitPeringatanSatu",0,0,60)
+	RegisterParameterInt("DetikPeringatanSatu","DetikPeringatanSatu",0,0,59)
+	RegisterParameterContainer("SuaraMenitPeringatanSatu", "Container Suara Menit Peringatan Satu")
+	RegisterParameterContainer("SuaraDetikPeringatanSatu", "Container Suara Detik Peringatan Satu")
+
+	'parameter untuk suara peringatan kedua
+	RegisterParameterInt("MenitPeringatanDua","MenitPeringatanDua",0,0,60)
+	RegisterParameterInt("DetikPeringatanDua","DetikPeringatanDua",0,0,59)
+	RegisterParameterContainer("SuaraMenitPeringatanDua", "Container Suara Menit Peringatan Dua")
+	RegisterParameterContainer("SuaraDetikPeringatanDua", "Container Suara Detik Peringatan Dua")
+
+	'parameter untuk suara peringatan ketiga
+	RegisterParameterInt("MenitPeringatanTiga","MenitPeringatanTiga",0,0,60)
+	RegisterParameterInt("DetikPeringatanTiga","DetikPeringatanTiga",0,0,59)
+	RegisterParameterContainer("SuaraMenitPeringatanTiga", "Container Suara Menit Peringatan Tiga")
+	RegisterParameterContainer("SuaraDetikPeringatanTiga", "Container Suara Detik Peringatan Tiga")
+	
+	RegisterPushButton("Reset", "Reset", 0)
+end sub
+
+sub OnExecPerField()
+	if StatusTimer_lb = true then
+		WAKTU = GetCurrentTime()
+		DETIK = WAKTU.Second	
+			
+		'detik yg sedang berjalan
+		Scene.FindContainer("DetikSaatIni").Geometry.Text = DuaDigit(CStr(DETIK))
+		DetikSaatIni_li = Cint(Scene.FindContainer("DetikSaatIni").Geometry.Text)
+		
+		if Scene.FindContainer("Detik").Geometry.Text = "00" and Scene.FindContainer("Menit").Geometry.Text = "00" then
+			cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*StatusTimer SET 0"
+			SendCommand(cmd_ls)
+		end if	
+		
+		if DetikLama_li <> DetikSaatIni_li then
+			DetikLama_li = DetikSaatIni_li
+						
+			'ambil nilai detik inputan
+			DetikCountDown_li = cint(Scene.FindContainer("Detik").Geometry.Text)
+			MenitCountDown_li = cint(Scene.FindContainer("Menit").Geometry.Text)			
+	
+			'tampilkan detik countdownnya	 
+			Scene.FindContainer("Detik").Geometry.Text = DuaDigit(cstr(DetikCountDown_li - 1))
+			
+			'kelap-kelip separator
+			if StatusSeparator_lb = true then
+				Scene.FindContainer("Separator").Active = true
+			elseif StatusSeparator_lb = false then
+				Scene.FindContainer("Separator").Active = false
+			end if
+			StatusSeparator_lb= not(StatusSeparator_lb)
+			
+			'pengurangan menit saat detiknya nol
+			if DetikCountDown_li = 0 then
+				Scene.FindContainer("Menit").Geometry.Text = DuaDigit(Cstr(MenitCountDown_li - 1))
+				Scene.FindContainer("Detik").Geometry.Text = CStr(59)
+			end if
+			
+			'periksa apakah detinya telah memasuki peringatan yg telah ditentukan
+			Peringatan()
+		end if
+	end if
+end sub
+
+sub OnParameterChanged(parameterName As String)
+	if parameterName = "StatusTimer" then
+		StatusTimer_lb = GetParameterBool("StatusTimer")
+	elseif parameterName = "Detik" then		
+		DetikCountDown_li = GetParameterInt("Detik")
+		GetParameterContainer("ContainerDetik").Geometry.Text = DuaDigit(CStr(GetParameterInt("Detik")))
+	elseif parameterName = "Menit" then		
+		MenitCountDown_li = GetParameterInt("Menit")
+		GetParameterContainer("ContainerMenit").Geometry.Text = DuaDigit(CStr(GetParameterInt("Menit")))
+		
+	'bila inputan menit satu berubah maka nilai container peringatan menit juga berubah
+	elseif parameterName = "MenitPeringatanSatu" then
+		SuaraMenitPeringatanSatu_lc = GetParameterContainer("SuaraMenitPeringatanSatu")
+		SuaraMenitPeringatanSatu_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("MenitPeringatanSatu")))
+	elseif parameterName = "DetikPeringatanSatu" then
+		SuaraDetikPeringatanSatu_lc = GetParameterContainer("SuaraDetikPeringatanSatu")
+		SuaraDetikPeringatanSatu_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("DetikPeringatanSatu")))
+	'bila inputan menit dua berubah maka nilai container peringatan menit juga berubah
+	elseif parameterName = "MenitPeringatanDua" then
+		SuaraMenitPeringatanDua_lc = GetParameterContainer("SuaraMenitPeringatanDua")
+		SuaraMenitPeringatanDua_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("MenitPeringatanDua")))
+	elseif parameterName = "DetikPeringatanDua" then
+		SuaraDetikPeringatanDua_lc = GetParameterContainer("SuaraDetikPeringatanDua")
+		SuaraDetikPeringatanDua_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("DetikPeringatanDua")))
+	'bila inputan menit tiga berubah maka nilai container peringatan menit juga berubah
+	elseif parameterName = "MenitPeringatanTiga" then
+		SuaraMenitPeringatanTiga_lc = GetParameterContainer("SuaraMenitPeringatanTiga")
+		SuaraMenitPeringatanTiga_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("MenitPeringatanTiga")))
+	elseif parameterName = "DetikPeringatanTiga" then
+		SuaraDetikPeringatanTiga_lc = GetParameterContainer("SuaraDetikPeringatanTiga")
+		SuaraDetikPeringatanTiga_lc.Geometry.Text = DuaDigit(CStr(GetParameterInt("DetikPeringatanTiga")))
+	
+	elseif parameterName = "VizLayer" then
+		SelectedVizLayer_li = GetParameterInt(parameterName)
+		'println "SelectedVizLayer_li -> " & KonversiLayer(SelectedVizLayer_li)
+	end if
+end sub
+
+Function DuaDigit(nilai as string) as string
+	if nilai.length = 1 then
+		nilai = "0" & nilai
+	end if 
+	DuaDigit = nilai
+end function
+
+sub OnExecAction(buttonId As Integer)
+	if buttonId = 0 then 
+		GettingData()
+	end if
+end sub
+
+Sub Reset()
+	'kasih inputan ke masing-masing variabel dari masing-masing kontainer
+	DetikCountDown_li = GetParameterInt("Detik")
+	MenitCountDown_li = GetParameterInt("Menit")
+
+	'tampilkan output menit
+	ContainerMenit_lc = GetParameterContainer("ContainerMenit")
+	ContainerMenit_lc.Geometry.Text = DuaDigit(CStr(MenitCountDown_li))
+	'tampilkan output detik
+	ContainerDetik_lc = GetParameterContainer("ContainerDetik")
+	ContainerDetik_lc.Geometry.Text = DuaDigit(CStr(DetikCountDown_li))
+end sub
+
+Sub Peringatan()
+	if Scene.FindContainer("MenitPeringatanSatu").Geometry.Text = Scene.FindContainer("Menit").Geometry.Text and Scene.FindContainer("DetikPeringatanSatu").Geometry.Text = Scene.FindContainer("Detik").Geometry.Text then
+		'ambil nilai layer viz setiap detiknya
+		SelectedVizLayer_li = GetParameterInt("VizLayer")
+		cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$PeringatanSatu*AUDIO*TEST_CLIP PLAY" 
+		SendCommand(cmd_ls)
+	elseif Scene.FindContainer("MenitPeringatanDua").Geometry.Text = Scene.FindContainer("Menit").Geometry.Text and Scene.FindContainer("DetikPeringatanDua").Geometry.Text = Scene.FindContainer("Detik").Geometry.Text then
+		'ambil nilai layer viz setiap detiknya
+		SelectedVizLayer_li = GetParameterInt("VizLayer")
+		cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$PeringatanDua*AUDIO*TEST_CLIP PLAY"
+		SendCommand(cmd_ls)
+	elseif Scene.FindContainer("Menit").Geometry.Text = "00" and Scene.FindContainer("Detik").Geometry.Text = "00" then
+		'ambil nilai layer viz setiap detiknya
+		SelectedVizLayer_li = GetParameterInt("VizLayer")
+		cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$PeringatanAkhir*AUDIO*TEST_CLIP PLAY"
+		SendCommand(cmd_ls)
+		'nyalain separator
+		Scene.FindContainer("Separator").Active = true
+	elseif Scene.FindContainer("MenitPeringatanTiga").Geometry.Text = Scene.FindContainer("Menit").Geometry.Text and Cint(Scene.FindContainer("DetikPeringatanTiga").Geometry.Text) >= Cint((Scene.FindContainer("Detik").Geometry.Text)) then
+		'ambil nilai layer viz setiap detiknya
+		SelectedVizLayer_li = GetParameterInt("VizLayer")
+		cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$PeringatanTiga*AUDIO*TEST_CLIP PLAY"
+		SendCommand(cmd_ls)
+	end if
+End Sub
+
+Sub GettingData()
+	dim Menit_ls, Detik_ls, MenitPeringatanSatu_ls, DetikPeringatanSatu_ls, MenitPeringatanDua_ls, DetikPeringatanDua_ls, MenitPeringatanTiga_ls, DetikPeringatanTiga_ls as String
+
+	'Setting menit
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$TotalMenit*GEOM*TEXT GET"
+	Menit_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*Menit SET " & Menit_ls
+	SendCommand(cmd_ls)
+	
+	'Setting deitk
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$TotalDetik*GEOM*TEXT GET"
+	Detik_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*Detik SET " & Detik_ls
+	SendCommand(cmd_ls)
+	
+	'Setting Menit Peringatan Satu
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$MenitPeringatanSatu*GEOM*TEXT GET"
+	MenitPeringatanSatu_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*MenitPeringatanSatu SET " & MenitPeringatanSatu_ls
+	SendCommand(cmd_ls)
+
+	'Setting Detik Peringatan Satu
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DetikPeringatanSatu*GEOM*TEXT GET"
+	DetikPeringatanSatu_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*DetikPeringatanSatu SET " & DetikPeringatanSatu_ls
+	SendCommand(cmd_ls)
+	
+	'Setting Menit Peringatan Dua
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$MenitPeringatanDua*GEOM*TEXT GET"
+	MenitPeringatanDua_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*MenitPeringatanDua SET " & MenitPeringatanDua_ls
+	SendCommand(cmd_ls)
+
+	'Setting Detik Peringatan Dua
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DetikPeringatanDua*GEOM*TEXT GET"
+	DetikPeringatanDua_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*DetikPeringatanDua SET " & DetikPeringatanDua_ls
+	SendCommand(cmd_ls)
+	
+	'Setting Menit Peringatan Tiga
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$MenitPeringatanTiga*GEOM*TEXT GET"
+	MenitPeringatanTiga_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*MenitPeringatanTiga SET " & MenitPeringatanTiga_ls
+	SendCommand(cmd_ls)
+
+	'Setting Detik Peringatan Tiga
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DetikPeringatanTiga*GEOM*TEXT GET"
+	DetikPeringatanTiga_ls = CStr(SendCommand(cmd_ls))
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*DetikPeringatanTiga SET " & DetikPeringatanTiga_ls
+	SendCommand(cmd_ls)
+	
+	'nyalain separator
+	Scene.FindContainer("Separator").Active = true
+
+	'transfer dari total menit dan detik ke menit dan detik ajah
+	Scene.FindContainer("Menit").Geometry.Text = GetParameterContainer("ContainerMenit").Geometry.Text
+	Scene.FindContainer("Detik").Geometry.Text = GetParameterContainer("ContainerDetik").Geometry.Text
+			
+	'mulai reset
+	Reset()
+End Sub
+
+Sub StartTimer()
+	'mulai reset dan stopin
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*StatusTimer SET 1"
+	SendCommand(cmd_ls)
+End Sub
+
+Sub StopTimer()
+	'mulai reset dan stopin
+	cmd_ls = "RENDERER" & KonversiLayer(SelectedVizLayer_li) & "TREE*$DataCountDown*SCRIPT*INSTANCE*StatusTimer SET 0"
+	SendCommand(cmd_ls)
+End Sub
+
+Function KonversiLayer(nilai as integer) as string
+	if nilai = 0 then
+		KonversiLayer = "*FRONT_LAYER*"
+	elseif nilai = 1 then
+		KonversiLayer = "*"
+	elseif nilai = 2 then
+		KonversiLayer = "*BACK_LAYER*"
+	end if
+end function
+
+
+

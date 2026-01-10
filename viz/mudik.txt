@@ -1,0 +1,306 @@
+dim status as boolean=false
+dim send,filepath as string
+dim lokasifile, strlokasifile, strfiledata as string
+dim arrstrlokasifile, arrstrlokasifileisi, arrstrisibaris, arrisibarisdata,arraybaru as Array[String]
+
+sub OnInitParameters()
+
+		RegisterParameterString("Path_File", "Path_Path", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\MUDIK2015\\", 70, 70, "")
+
+end sub
+
+'Out
+
+sub allOut()
+
+		send = "RENDERER*STAGE*DIRECTOR*PANGGUNG CONTINUE REVERSE"
+		SendCommand(send)	
+
+		send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR CONTINUE"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INPETAKECIL SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INKONTEN SHOW 0"
+		SendCommand(send)	
+
+end sub 
+
+sub reset ()
+
+		send = "RENDERER*STAGE*DIRECTOR*PANGGUNG SHOW 0"
+		SendCommand(send)	
+	
+		send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INPETAKECIL SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INKONTEN SHOW 0"
+		SendCommand(send)	
+
+end sub
+
+
+'Start 
+sub allIn()
+
+resetmarking ()
+resetprovinsi ()
+
+		send = "RENDERER*STAGE*DIRECTOR*INPETAKECIL SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*INKONTEN SHOW 0"
+		SendCommand(send)	
+		
+		send = "RENDERER*STAGE*DIRECTOR*PANGGUNG SHOW 0"
+		SendCommand(send)	
+
+		send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR SHOW 0"
+		SendCommand(send)	
+		
+
+		send = "RENDERER*STAGE*DIRECTOR*PANGGUNG CONTINUE"
+		SendCommand(send)	
+
+		send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR CONTINUE"
+		SendCommand(send)	
+		
+
+end sub
+
+'Back To Indonesia
+
+sub backToIndonesia()
+
+	resetmarking ()
+
+	send = "RENDERER*STAGE*DIRECTOR*INKONTEN CONTINUE REVERSE"
+	SendCommand(send)	
+
+	send = "RENDERER*STAGE*DIRECTOR*INPETAKECIL CONTINUE"
+	SendCommand(send)	
+	
+	send = "RENDERER*STAGE*DIRECTOR*INOUTPETABESAR CONTINUE"
+	SendCommand(send)
+		
+end sub	
+
+'Send Province
+sub provinsi(markprovinsi as string)
+
+	resetprovinsi ()
+
+	Scene.FindContainer("NAMA_PROVINSI").geometry.text = markprovinsi
+
+	
+	send = "RENDERER*TREE*$MARKING-" & markprovinsi & "*ACTIVE SET on"
+	SendCommand(send)	
+	
+	send = "RENDERER*TREE*$PROVINSI-" & markprovinsi & "*ACTIVE SET on"
+	SendCommand(send)	
+	
+	send = "RENDERER*STAGE*DIRECTOR*INPETAKECIL CONTINUE"
+	SendCommand(send)	
+	
+end sub
+
+'Send Icon
+sub icon(namaicon as string,pathfile as string)
+
+	reseticon()
+	
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Path_File") & pathfile & ".txt"
+	System.LoadTextFile(lokasifile, strlokasifile)
+	'println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrisibarisdata)
+	'println "strlokasifile : " & strlokasifile
+	
+	
+	for i = 1 to arrisibarisdata.ubound - 2
+		arrisibarisdata[i].split(";", arrstrisibaris) 
+		
+		
+		scene.findcontainer("LAPORAN_"&i).Geometry.text =  arrstrisibaris[0]
+		scene.findcontainer("SUB_LAPORAN_"&i).Geometry.text =  arrstrisibaris[1]
+
+
+	next
+	
+		
+	for i = 0 to arrisibarisdata.ubound - 2
+		arrisibarisdata[0].split(";", arrstrisibaris) 
+		
+		scene.findcontainer("NAMA_KOTA").Geometry.text =  arrstrisibaris[0]
+
+
+	next
+	
+	
+	
+	
+	
+	send = "RENDERER*TREE*$" & namaicon & "*ACTIVE SET on"
+	SendCommand(send)
+	
+	
+	send = "RENDERER*STAGE*DIRECTOR*INKONTEN SHOW 0"
+	SendCommand(send)
+	send = "RENDERER*STAGE*DIRECTOR*INKONTEN CONTINUE"
+	SendCommand(send)
+	
+	'println pathfile
+
+end sub
+
+
+sub isiKota(judul as string,laporan as string)
+
+
+end sub
+
+'-----------------------------------------------------------
+sub resetprovinsi ()
+
+	send = "RENDERER*TREE*$PROVINSI-ACEH*ACTIVE SET Off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$PROVINSI-SUMUT*ACTIVE SET Off"
+	SendCommand(send)	
+	
+	send = "RENDERER*TREE*$PROVINSI-RIAU*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-KEPRI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-SUMBAR*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-JAMBI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-BENGKULU*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-SUMSEL*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-BABEL*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-LAMPUNG*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-BANTEN*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-DKI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-JABAR*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-JATENG*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-DIY*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$PROVINSI-JATIM*ACTIVE SET Off"
+	SendCommand(send)
+
+
+end sub
+
+
+sub reseticon()
+
+	send = "RENDERER*TREE*$CUACA*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$OLEH-OLEH*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$MACET*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$PASAR*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$REST_AREA*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$MAKAN*ACTIVE SET off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$WISATA2*ACTIVE SET off"
+	SendCommand(send)
+
+
+end sub
+
+sub resetmarking ()
+
+	send = "RENDERER*TREE*$MARKING-ACEH*ACTIVE SET Off"
+	SendCommand(send)
+	
+	send = "RENDERER*TREE*$MARKING-SUMUT*ACTIVE SET Off"
+	SendCommand(send)	
+	
+	send = "RENDERER*TREE*$MARKING-RIAU*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-KEPRI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-SUMBAR*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-JAMBI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-BENGKULU*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-SUMSEL*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-BABEL*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-LAMPUNG*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-BANTEN*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-DKI*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-JABAR*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-JATENG*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-DIY*ACTIVE SET Off"
+	SendCommand(send)
+		
+	send = "RENDERER*TREE*$MARKING-JATIM*ACTIVE SET Off"
+	SendCommand(send)
+
+
+end sub
+
+
+

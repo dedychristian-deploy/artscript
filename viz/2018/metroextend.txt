@@ -1,0 +1,368 @@
+'#SOCMED
+dim arrRowAllSOCMED as array[string]
+dim strRowAllSOCMED as array[string]
+dim fileAllSOCMED as string
+dim strDataAllSOCMED as string
+dim strDataBarisSOCMED as string
+dim AllSOCMEDcounter as integer
+
+'#EMOTION
+dim arrRowAllEMOTION as array[string]
+dim strRowAllEMOTION as array[string]
+dim fileAllEMOTION as string
+dim strDataAllEMOTION as string
+dim strDataBarisEMOTION as string
+dim AllEMOTIONcounter as integer
+
+dim a as string
+dim Layer as string
+
+'##################
+dim ar,br as string
+dim arr_b, arr_c as Array[string]
+dim arr_isi, arr_isi_all as Array[string]
+
+dim change_bool as boolean
+
+'arr_isi.clear()
+'arr_c.clear()
+'##################
+
+dim toggle as boolean 
+dim delay as boolean
+dim inc as integer
+
+sub OnInit()
+	delay = false
+	toggle = false
+	inc = 0
+	
+'	stage.finddirector( "IN_SOCMED" ).time = 0
+'	stage.finddirector( "IN_SOCMED" ).reverse = false	
+'	
+'	stage.finddirector( "READ_TEXT" ).time = 0
+'	stage.finddirector( "READ_TEXT" ).reverse = false
+	
+	
+	
+	stage.finddirector( "INOUT_SOCMED" ).time = 0
+	stage.finddirector( "INOUT_SOCMED" ).reverse = false	
+	
+	stage.finddirector( "READ_COMMENT" ).time = 0
+	stage.finddirector( "READ_COMMENT" ).reverse = false
+	
+	stage.finddirector( "READ_COMMENT2" ).time = 0
+	stage.finddirector( "READ_COMMENT2" ).reverse = false
+	
+	this.material.color.rgb = cvertex(255,0,0)/255
+
+end sub
+
+sub OnLButtonDown()
+'LamaTampil()
+
+if not(toggle) then
+		toggle = true		 			
+		
+'		stage.finddirector( "IN_SOCMED" ).reverse = false
+'		stage.finddirector( "IN_SOCMED" ).ContinueAnimation()
+		
+		stage.finddirector( "INOUT_SOCMED" ).reverse = false
+		stage.finddirector( "INOUT_SOCMED" ).ContinueAnimation()
+		
+		this.material.color.rgb = cvertex(0,255,0)/255
+	else
+		toggle = false		
+		stage.finddirector( "INOUT_SOCMED" ).reverse = false
+		stage.finddirector( "INOUT_SOCMED" ).ContinueAnimation()
+
+
+'		stage.finddirector( "READ_TEXT" ).StopAnimation()
+		stage.finddirector( "READ_COMMENT" ).StopAnimation()
+		stage.finddirector( "READ_COMMENT2" ).StopAnimation()
+
+	this.material.color.rgb = cvertex(255,0,0)/255	
+		delay = true
+	end if
+
+end sub
+
+
+
+	AllSOCMEDcounter = -1
+dim panjangkarakter_int, banyakbaris_int, karakterperbaris_int, konversisatubariskeY_int, nilaiY_int , totalY as integer
+
+
+sub OnInitParameters()	
+	RegisterParameterString("_windowspath", "Comment Path", "\\\\192.168.150.214\\onair_files\\sosmed-medcom\\comment\\", 60,100, "")
+	RegisterParameterString("AllSOCMED", "Data Social Media", "update.txt", 40,100, "")
+	
+	RegisterParameterString("_emotionpath", "Emotion Path", "\\\\192.168.150.214\\onair_files\\sosmed-medcom\\mood\\", 60,100, "")
+	RegisterParameterString("AllEMOTION", "Data Emotion", "update.txt", 40,100, "")
+	
+	RegisterParameterString("Layer", "Layer", "FRONT_LAYER", 40,100, "")
+end sub
+
+sub OnParameterChanged(parameterName As String)
+	if parameterName = "Layer" then
+		Layer = GetParameterString("Layer")
+	end if	
+end sub
+
+sub ReadData()
+		dim i, y as integer
+
+		fileAllSOCMED = GetParameterString("_windowspath") & GetParameterString("AllSOCMED")
+		System.LoadTextFile(fileAllSOCMED, strDataAllSOCMED)
+		
+		ar = strDataAllSOCMED
+		
+		''a.split("&&", arr_b)
+		ar.split(Chr(10), arr_b)
+		
+		for i = 0 to arr_b.ubound-1
+			
+			change_bool = arr_b[i].EndsWith(".jpg")
+			
+			if change_bool then
+				arr_b[i].Append("`")
+			end if
+	
+		next
+			
+			'join dgn karakter pengganti Enter Chr(10)
+			br.join(arr_b," ")
+			
+			'println br
+			br.split("`", arr_isi)
+		
+end sub
+
+sub ReadDataEmotion()
+		dim i, y as integer
+
+		'#Emotion
+		
+		'tentukan lokasi file text
+		fileAllEMOTION = GetParameterString("_emotionpath") & GetParameterString("AllEMOTION")
+
+		'ambil isi file text
+		System.LoadTextFile(fileAllEMOTION, strDataAllEMOTION)
+						
+		'split strDataNewsfeed dan masukkan isinya ke arrRowNewsfeed
+		strDataAllEMOTION.split(Chr(10), arrRowAllEMOTION)
+		'println 		strDataAllEMOTION
+		
+end sub
+
+
+sub GetAllSOCMED()
+	Layer = GetParameterString("Layer")
+		
+	'AllSOCMEDcounter = AllSOCMEDcounter + 2
+	
+	
+	for y = 0 to 4 
+		arrRowAllEMOTION[y].split("|", strRowAllEMOTION)
+		scene.findcontainer("$GROUP_ALL_EMOTION$EMOTION_"& y+1 &"$val").Geometry.text = strRowAllEMOTION[1]
+		sendCommand("RENDERER*"&Layer&"*TREE*$GROUP_ALL_EMOTION$EMOTION_"& y+1 &"$val*FUNCTION*ControlAction*input SET " & strRowAllEMOTION[1])
+	next
+	
+
+'##########################
+
+			
+'		for i = 0 to 2		
+'			arr_isi[i].split("|", strRowAllSOCMED)
+'			strRowAllSOCMED[0].substitute(Chr(10), "", true)
+'			scene.findcontainer("$GRUP_KOMEN_1$BAR_KOMEN"& i + 1&"$KOMENTAR").Geometry.text = strRowAllSOCMED[1]
+'			'scene.findcontainer("$SOSMED_"& i+1 &"$Account").Geometry.text = strRowAllSOCMED[0]
+'		
+'		next
+'		
+		'println arr_isi[3]
+		
+		println "dedy"
+
+'#########################
+	
+end sub
+
+sub GetSOCMED1()
+	
+
+'###################
+
+		'println "ini" & AllSOCMEDcounter
+	AllSOCMEDcounter = AllSOCMEDcounter + 1
+	
+	if arr_isi[AllSOCMEDcounter].length > 3 then
+			
+				arr_isi[AllSOCMEDcounter].split("|", strRowAllSOCMED)
+				strRowAllSOCMED[0].substitute(Chr(10), "", true)
+'				scene.findcontainer("$SOSMED_1$Comment").Geometry.text = strRowAllSOCMED[1]
+'				scene.findcontainer("$SOSMED_1$Account").Geometry.text = strRowAllSOCMED[0]
+				
+				scene.findcontainer("$GRUP_KOMEN_1$BAR_KOMEN1$KOMENTAR").Geometry.text = strRowAllSOCMED[1]
+				scene.findcontainer("$GRUP_KOMEN_1$BAR_KOMEN1$NAMA").Geometry.text = strRowAllSOCMED[0]
+
+	
+	elseif arr_isi[AllSOCMEDcounter].length < 3 then
+			'println "1"
+			
+			AllSOCMEDcounter = -1
+			
+			'arr_isi.clear()
+			arr_c.clear()
+		
+			ReadData()
+			GetSOCMED1()	
+		end if
+
+'println "iiinnniii " & AllSOCMEDcounter
+
+'###################
+
+end sub
+
+sub GetSOCMED2()
+	
+
+'###################
+
+		AllSOCMEDcounter = AllSOCMEDcounter + 1
+		'println "ini" & AllSOCMEDcounter
+
+	if arr_isi[AllSOCMEDcounter].length > 3 then
+			
+				arr_isi[AllSOCMEDcounter].split("|", strRowAllSOCMED)
+				strRowAllSOCMED[0].substitute(Chr(10), "", true)
+'				scene.findcontainer("$SOSMED_2$Comment").Geometry.text = strRowAllSOCMED[1]
+'				scene.findcontainer("$SOSMED_2$Account").Geometry.text = strRowAllSOCMED[0]
+
+				scene.findcontainer("$GRUP_KOMEN_1$BAR_KOMEN2$KOMENTAR").Geometry.text = strRowAllSOCMED[1]
+				scene.findcontainer("$GRUP_KOMEN_1$BAR_KOMEN2$NAMA").Geometry.text = strRowAllSOCMED[0]
+				
+				'println strRowAllSOCMED[1]
+	
+	elseif arr_isi[AllSOCMEDcounter].length < 3 then
+			'println "2"
+			
+			AllSOCMEDcounter = -1
+			arr_c.clear()
+		
+			ReadData()
+			GetSOCMED2()	
+		end if
+
+'println "iiinnniii " & AllSOCMEDcounter
+
+'###################
+
+'println "iinniiil " & AllSOCMEDcounter
+
+end sub
+
+sub GetSOCMED3()
+
+'###################
+
+		AllSOCMEDcounter = AllSOCMEDcounter + 1
+		'println "ini" & AllSOCMEDcounter
+		
+		'println "ini" & AllSOCMEDcounter
+
+	if arr_isi[AllSOCMEDcounter].length > 3 then
+			
+				arr_isi[AllSOCMEDcounter].split("|", strRowAllSOCMED)
+				strRowAllSOCMED[0].substitute(Chr(10), "", true)
+'				scene.findcontainer("$SOSMED_3$Comment").Geometry.text = strRowAllSOCMED[1]
+'				scene.findcontainer("$SOSMED_3$Account").Geometry.text = strRowAllSOCMED[0]
+
+				scene.findcontainer("$GRUP_KOMEN_2$BAR_KOMEN1$KOMENTAR").Geometry.text = strRowAllSOCMED[1]
+				scene.findcontainer("$GRUP_KOMEN_2$BAR_KOMEN1$NAMA").Geometry.text = strRowAllSOCMED[0]
+				
+				'println strRowAllSOCMED[1]
+	
+	elseif arr_isi[AllSOCMEDcounter].length < 3  then
+			'println "3"
+			
+			AllSOCMEDcounter = -1
+			arr_c.clear()
+		
+			ReadData()
+			GetSOCMED3()	
+		end if
+
+'println "iiinnniii " & AllSOCMEDcounter
+
+'###################
+
+'println "iinniii " & arr_isi.ubound
+
+
+end sub
+
+sub GetSOCMED4()
+
+'###################
+
+		AllSOCMEDcounter = AllSOCMEDcounter + 1
+		'println "ini" & AllSOCMEDcounter
+		
+		'println "ini" & AllSOCMEDcounter
+
+	if arr_isi[AllSOCMEDcounter].length > 3 then
+			
+				arr_isi[AllSOCMEDcounter].split("|", strRowAllSOCMED)
+				strRowAllSOCMED[0].substitute(Chr(10), "", true)
+'				scene.findcontainer("$SOSMED_3$Comment").Geometry.text = strRowAllSOCMED[1]
+'				scene.findcontainer("$SOSMED_3$Account").Geometry.text = strRowAllSOCMED[0]
+
+				scene.findcontainer("$GRUP_KOMEN_2$BAR_KOMEN2$KOMENTAR").Geometry.text = strRowAllSOCMED[1]
+				scene.findcontainer("$GRUP_KOMEN_2$BAR_KOMEN2$NAMA").Geometry.text = strRowAllSOCMED[0]
+				
+				'println strRowAllSOCMED[1]
+	
+	elseif arr_isi[AllSOCMEDcounter].length < 3  then
+			'println "3"
+			
+			AllSOCMEDcounter = -1
+			arr_c.clear()
+		
+			ReadData()
+			GetSOCMED4()	
+		end if
+
+'println "iiinnniii " & AllSOCMEDcounter
+
+'###################
+
+'println "iinniii " & arr_isi.ubound
+
+
+end sub
+
+
+Sub LamaTampil()
+	dim komentar_str as string
+	AllSOCMEDcounter = -1
+end sub
+
+Sub EmotionChange()
+		Layer = GetParameterString("Layer")
+		
+		for y = 0 to 4 
+		arrRowAllEMOTION[y].split("|", strRowAllEMOTION)
+		scene.findcontainer("$EMOTION_"& y+1 &"$val").Geometry.text = strRowAllEMOTION[1]
+		sendCommand("RENDERER*"&Layer&"*TREE*$EMOTION_"& y+1 &"$val*FUNCTION*ControlAction*input SET " & strRowAllEMOTION[1])
+		next
+end sub
+
+
+
+sub OnLButtonUp()
+end sub
+
+
+

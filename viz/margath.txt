@@ -1,0 +1,181 @@
+dim cmd,cmk,cmd1,fileAllSOCMED,strDataAllSOCMED as string
+dim cek as container
+dim i,a,u,f,t,tw,twt as integer
+dim lokasifile, isi as string
+dim arrisifolder as Array[String] 
+dim arrRowAllSOCMED as array[string]
+dim strRowAllSOCMED as array[string]
+dim  AllSOCMEDcounter as integer
+dim panjangkarakter_int, banyakbaris_int, karakterperbaris_int, konversisatubariskeY_int, nilaiY_int , totalY as integer
+
+sub OnLButtonDown()
+
+
+lokasifile = GetParameterString("pathFolder")
+
+	arrisifolder = System.GetDirectoryContent(lokasifile, "*.jpg" ) 
+	
+	println i
+
+	f = 12
+	'println f
+	
+	if i >= (arrisifolder.ubound-1)  then
+
+
+		'bacaData()
+		i = 0
+		
+		for a = 1 to f
+		
+		cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & "" &a+i&".jpg" 
+		
+		'cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & "image_" &a+i&".jpg" 
+		
+		'cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & arrisifolder [(a -1)+ i]
+		
+		SendCommand(cmd)
+		
+		next
+		
+		i= i+12
+		
+
+	else
+	
+	'f = 24
+	println f
+	
+	
+		for a = 1 to f
+		
+		cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & "" &a+i&".jpg" 
+		
+		'cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & arrisifolder [(a -1) + i]
+		
+		SendCommand(cmd)
+		
+		if arrisifolder [a + i] = "" then
+		
+		println "KOSONG = " & arrisifolder [a + i]
+		
+		f = ((arrisifolder.ubound-1) mod 12)
+		println "ini :" & f 
+			cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & "" &a+i&".jpg" 
+			
+			'cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & arrisifolder [(a -1) + i]
+		
+		SendCommand(cmd)
+		
+		
+		
+		end if
+		
+		next
+		i= i+12
+	
+	
+	end if
+
+	
+	
+	
+	
+
+end sub
+
+
+
+
+sub GetSOCMED()
+''	'dim u as integer
+''	
+'		t = 6
+'	
+'	
+'		'tentukan lokasi file text
+'		fileAllSOCMED = GetParameterString("pathTwitter") & GetParameterString("AllSOCMED")
+'
+'		'ambil isi file text
+'		System.LoadTextFile(fileAllSOCMED, strDataAllSOCMED)
+'
+'		strDataAllSOCMED.split(Chr(10), arrRowAllSOCMED)
+'		
+'		
+'if i >= (arrRowAllSOCMED.ubound-1)  then 
+'
+'tw = 0
+'
+'		for a = 1 to t
+'								
+'				arrRowAllSOCMED[(a-1) + tw].split(".",strRowAllSOCMED)
+'				strRowAllSOCMED[2].Replace(0,2,"" ) 
+'				
+'				scene.findcontainer("nama0"& a ).Geometry.text =   strRowAllSOCMED[1]
+'				scene.findcontainer("komentar0"& a ).Geometry.text =   strRowAllSOCMED[2]
+'				
+'				println strRowAllSOCMED[1]
+'				println tw+twt
+'				'scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =   sosmedlist
+'		next
+'
+'		
+'		i= i + 6
+'		
+'		
+'		else
+'	
+'	'f = 6
+'	'println f
+'	
+'	
+'		for a = 1 to t
+'		
+'		arrRowAllSOCMED[(a-1) + tw].split(".",strRowAllSOCMED)
+'				strRowAllSOCMED[2].Replace(0,2,"" ) 
+'				
+'				scene.findcontainer("nama0"& a ).Geometry.text =   strRowAllSOCMED[1]
+'				scene.findcontainer("komentar0"& a ).Geometry.text =   strRowAllSOCMED[2]
+'				
+'				println strRowAllSOCMED[1]
+'		
+'		if arrRowAllSOCMED [a + tw] = "" then
+'		
+'		println "KOSONG"
+'		
+'		t = ((arrRowAllSOCMED.ubound-1) mod 6)
+'		println "ini :" & t 
+'		
+'		arrRowAllSOCMED[(a-1) + tw].split(".",strRowAllSOCMED)
+'				strRowAllSOCMED[2].Replace(0,2,"" ) 
+'				
+'				scene.findcontainer("nama0"& a ).Geometry.text =   strRowAllSOCMED[1]
+'				scene.findcontainer("komentar0"& a ).Geometry.text =   strRowAllSOCMED[2]
+'				
+'				'println strRowAllSOCMED[1]
+'		
+'		
+'		
+'		end if
+'		
+'		next
+'		i= i+6
+'
+'		
+'		end if
+
+	
+end sub
+
+
+
+sub OnInitParameters()
+
+	RegisterParameterString("pathFolder", "Path Folder", "\\\\192.168.16.92\\onair_files\\newsticker\\program_acara\\PILPRES\\GAMBAR\\", 50, 256, "")
+	'RegisterParameterString("pathTwitter", "Path Twitter", "\\\\192.168.16.92\\onair_files\\newsticker\\program_acara\\PILPRES\\GAMBAR\\", 50, 256, "")
+	'RegisterParameterString("AllSOCMED", "Data Social Media", "wide_shot_socialnetwork.txt", 40,100, "")
+	
+end sub
+
+
+

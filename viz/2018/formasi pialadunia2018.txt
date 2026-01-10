@@ -1,0 +1,37 @@
+dim cmd_ls as string
+	
+sub OnInitParameters()
+'	RegisterParameterString("PathImageTeam","PathImageTeam","",50,50,"")
+'	RegisterParameterString("PathImagePemain","PathImagePemain","",50,50,"")
+	RegisterParameterString("Server","Server Cam 1","",50,50,"")
+	RegisterParameterString("Server2","Server Cam 2","",50,50,"")
+	RegisterParameterInt("Port", "Port", 6100, 0, 9999)
+end sub
+
+Function GetPathScene() as string
+	'GetPathScene = GetParameterString("PathImageTeam")
+	
+	System.Map["Server"] = GetParameterString("Server")
+	System.Map["Server2"] = GetParameterString("Server2")
+	System.Map["Port"] = GetParameterInt("Port")
+end Function
+
+Function GetPathImagePemain() as string
+	'GetPathImagePemain = GetParameterString("PathImagePemain")
+end Function
+
+sub OnInit()
+	System.Map["Server"] = GetParameterString("Server")
+	System.Map["Server2"] = GetParameterString("Server2")
+	System.Map["Port"] = GetParameterInt("Port")
+end sub
+
+sub OnParameterChanged(parameterName As String)
+	if (parameterName = "Server") then
+		System.Map["Server"] = GetParameterString(parameterName) 
+	elseif (parameterName = "Server2") then
+		System.Map["Server2"] = GetParameterString(parameterName) 		
+	end if	
+end sub
+
+

@@ -1,0 +1,76 @@
+dim lokasifile, strlokasifile, cmd as string
+dim arrstrlokasifile, arrstrisibaris as Array[String] 
+dim totalbaris as integer
+dim x as string
+sub OnInitParameters()
+	RegisterFileSelector("LokasiText", "LokasiText", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\TRENDING TOPIC\\4. trend", "tranding_topik_issue_1.txt", "*.txt")
+end sub
+
+sub Isi()
+
+	'ambil isi file text
+	lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	
+	for i = 0 to arrstrlokasifile.ubound
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+		CekNilai(arrstrisibaris[0], arrstrisibaris[1])
+		CekNilai1(arrstrisibaris[0], arrstrisibaris[1])
+		CekNilai2(arrstrisibaris[0], arrstrisibaris[1])
+				
+	next
+	
+	
+	
+end sub
+
+Sub CekNilai(katakunci as string, nilai as string)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+
+	if katakunci = "path_quote" or katakunci = "PATH_QUOTE" then
+	cmd = "RENDERER*TREE*$FOTO-QUOTE-TREND*FUNCTION*ControlImage*input SET " & nilai
+	SendCommand(cmd)
+	
+	
+	end if
+	
+end sub
+
+Sub CekNilai1(katakunci as string, nilai as string)
+
+	if katakunci = "isi_quote" then
+	Scene.FindContainer("QOUTE_TREND").Geometry.Text = nilai
+	println nilai
+	end if
+	
+end sub
+
+Sub CekNilai2(katakunci as string, nilai as string)
+	
+	for i = 1 to 10
+	
+	if katakunci = "judul_content"&i then
+	Scene.FindContainer("JUDUL_CONTENT_" & i).Geometry.Text = nilai
+	println nilai
+	end if
+	if katakunci = "isi_content"&i then
+	Scene.FindContainer("ISI_CONTENT_" & i).Geometry.Text = nilai
+	println nilai
+	end if
+'	if katakunci = "path_image"&i then
+'	Scene.FindContainer("ISI_CONTENT_" & i).Geometry.Text = nilai
+'	println nilai
+'	end if
+	
+	next
+	
+end sub
+
+sub OnLButtonDown()
+	Isi()
+end sub
+
+sub OnLButtonUp()
+end sub

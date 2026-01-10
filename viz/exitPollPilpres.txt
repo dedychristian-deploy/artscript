@@ -1,0 +1,997 @@
+dim lokasifile, strlokasifile, strfiledata, cmd as string
+dim arrstrlokasifile, arrstrlokasifileisi, arrstrisibaris, arrisibarisdata as Array[String] 
+dim Kata_Kunci,pilih as string
+dim alamatfiledatasurvei as string
+dim pilihangraphic as integer
+dim alamatfile, isifile, send as string
+dim IsiKandidat as array[String]
+dim semuabaris, semuabarisawal, perbaris, tiapkandidat, tiapkandidatawal, kelipatansepuluh, kelipatansepuluhawal as integer
+dim strISI, strISIpersen As Array[String]
+dim totalbaris_li, jmlkandidat_li, indexTPS_li, indexTotalSuara_li, indexPartisipasi_li as integer
+
+
+sub OnInitParameters()
+	RegisterParameterString("Root_Path", "Root_Path", "\\\\192.168.16.92\\onair_files\\newsticker\\program_acara\\PILPRES\\test\\", 100, 100, "")
+	RegisterParameterInt("PilihanGraphic", "Pilihan Graphic", 0, 0, 40)
+	RegisterParameterString("PerolehanSuara", "Perolehan Suara", "chart_batang.txt", 50, 50, "")
+	RegisterParameterString("SebaranSuara", "Sebaran Suara", "sebaran_suara.txt", 50, 50, "")
+	RegisterParameterString("StabilitasSuara", "Stabilitas Suara", "chart_timeseries.txt", 50, 50, "")
+
+	RegisterParameterInt("StabilitasSuara_Jumlah_Kandidat", "Stabilitas Suara Jumlah_Kandidat", 2, 2, 100)
+	RegisterParameterInt("StabilitasSuara_Index_TotalSuara", "Stabilitas Suara Index_TotalSuara", 2, 2, 100)
+	RegisterParameterInt("StabilitasSuara_Index_TPS", "Stabilitas Suara Index_TPS", 3, 2, 100)
+	RegisterParameterInt("StabilitasSuara_Index_Partisipasi", "Stabilitas Suara Index_Partisipasi", 4, 2, 100)
+
+	RegisterParameterString("01_Kelompok_Pendidikan", "01_Kelompok_Pendidikan", "01_Kelompok_Pendidikan.txt", 50, 50, "")
+	RegisterParameterString("01_Kelompok_Usia", "01_Kelompok_Usia", "01_Kelompok_Usia.txt", 50, 50, "")
+	RegisterParameterString("01_Kinerja_Demokrasi", "01_Kinerja_Demokrasi", "01_Kinerja_Demokrasi.txt", 50, 50, "")
+	RegisterParameterString("01_Pemilu_Jurdil", "01_Pemilu_Jurdil", "01_Pemilu_Jurdil.txt", 50, 50, "")
+	RegisterParameterString("01_Tren_Educ", "01_Tren_Educ", "01_Tren_Educ.txt", 50, 50, "")
+
+	RegisterParameterString("01_Tren_Usia", "01_Tren_Usia", "01_Tren_Usia.txt", 50, 50, "")
+	RegisterParameterString("02_Atribut", "02_Atribut", "02_Atribut.txt", 50, 50, "")
+	RegisterParameterString("02_IklanTV", "02_IklanTV", "02_IklanTV.txt", 50, 50, "")
+	RegisterParameterString("02_PilihanByAtribut", "02_PilihanByAtribut", "02_PilihanByAtribut.txt", 50, 50, "")
+	RegisterParameterString("02_PilihanByIklanTV", "02_PilihanByIklanTV", "02_PilihanByIklanTV.txt", 50, 50, "")
+	RegisterParameterString("02_PilihanByTimses", "02_PilihanByTimses", "02_PilihanByTimses.txt", 50, 50, "")
+	RegisterParameterString("02_Timses", "02_Timses", "02_Timses.txt", 50, 50, "")
+	RegisterParameterString("03_Debat5", "03_Debat5", "03_Debat5.txt", 50, 50, "")
+	RegisterParameterString("03_DebatAll", "03_DebatAll", "03_DebatAll.txt", 50, 50, "")
+	RegisterParameterString("03_PilihanByDebat5", "03_PilihanByDebat5", "03_PilihanByDebat5.txt", 50, 50, "")
+	RegisterParameterString("03_PilihanByDebatAll", "03_PilihanByDebatAll", "03_PilihanByDebatAll.txt", 50, 50, "")
+
+	RegisterParameterString("04_PilihanByAgama", "04_PilihanByAgama", "04_PilihanByAgama.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByDesaKota", "04_PilihanByDesaKota", "04_PilihanByDesaKota.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByEduc", "04_PilihanByEduc", "04_PilihanByEduc.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByGender", "04_PilihanByGender", "04_PilihanByGender.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByIncome", "04_PilihanByIncome", "04_PilihanByIncome.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByNuMuh", "04_PilihanByNuMuh", "04_PilihanByNuMuh.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByPartai", "04_PilihanByPartai", "04_PilihanByPartai.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByReligius", "04_PilihanByReligius", "04_PilihanByReligius.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByUsia", "04_PilihanByUsia", "04_PilihanByUsia.txt", 50, 50, "")
+	RegisterParameterString("04_PilihanByZona", "04_PilihanByZona", "04_PilihanByZona.txt", 50, 50, "")
+
+	RegisterParameterString("00_Capres_Pilihan", "00_Capres_Pilihan", "00_Capres_Pilihan.txt", 50, 50, "")
+	
+end sub
+
+
+sub cek(Kata_Kunci as string)
+
+println "ini >> " &pilih
+
+'SendCommand("RENDERER*TREE*$LETS_CODE*GEOM*TEXT SET "& Kata_Kunci)
+if Kata_Kunci = "back" then
+
+	SendCommand("RENDERER*STAGE*DIRECTOR*" & pilih & " SHOW 0")
+	'SendCommand("RENDERER*STAGE*DIRECTOR*" & pilih & " CONTINUE REVERSE")
+	'SendCommand("RENDERER*STAGE*DIRECTOR*GRAPHIC_" & pilihan & " SHOW 0")
+	
+elseif Kata_Kunci = "next" then
+
+	SendCommand("RENDERER*STAGE*DIRECTOR*" & pilih & " CONTINUE")
+	
+elseif Kata_Kunci = "home" then
+
+	'kirim nilai nol
+	
+	
+		
+end if
+end sub
+
+'================ BEGIN SEBARAN SUARA =======================
+
+sub posisi(posisi as string)
+	Scene.Map["posisi"] = posisi
+	'println "posisi : " & Scene.Map["posisi"]
+end sub
+
+sub skala(skala as string)
+	Scene.Map["skala"] = skala
+	'println "skala : " & Scene.Map["skala"]
+end sub
+
+'isi nama kota di kontainer
+sub Sebaran_Suara(lokasisurvei as string)
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Root_Path") & lokasisurvei
+	System.LoadTextFile(lokasifile, strlokasifile)
+	println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	'println "strlokasifile : " & strlokasifile
+
+	'baca path format data sesuai urutan path di txt file
+	for i = 1 to arrstrlokasifile.ubound
+		arrstrlokasifile[i].split(";", arrstrlokasifileisi) 
+		Scene.FindContainer("PROVINSI" & i).Geometry.Text =	arrstrlokasifileisi[0]
+	next	
+
+	'judul graphic
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET JUDUL = SEBARAN SUARA MENURUT WILAYAH")
+end sub
+
+Sub CekNilai_SebaranSuara(katakunci as string)
+
+	'lokasi file sebaran suara
+	Sebaran_Suara(GetParameterString("SebaranSuara"))
+	
+	for i = 1 to arrstrlokasifile.ubound
+		arrstrlokasifile[i].split(";", arrstrlokasifileisi) 
+		katakunci.Substitute("#", " ", true)
+		if arrstrlokasifileisi[0] = katakunci then
+
+			'nilai sebaran suara pie masing2 kandidat
+			SendCommand("RENDERER*FUNCTION*DataPool*Data SET SEBARAN_SUARA_PIE_1 = " & arrstrlokasifileisi[4])
+			SendCommand("RENDERER*FUNCTION*DataPool*Data SET SEBARAN_SUARA_PIE_2 = " & arrstrlokasifileisi[5])
+		end if
+	next
+end sub
+
+Sub lokasidanskala_peta(namaprovinsi as string)
+	namaprovinsi.Substitute("#", " ", true)
+	
+	'println "namaprovinsi ::::::::::: " & namaprovinsi
+	if namaprovinsi = "JAWA" then
+		Scene.Map["posisi_peta"] = "242 155"
+		Scene.Map["skala_peta"] = "15 15 15"
+	elseif namaprovinsi = "DKI+BANTEN" then
+		Scene.Map["posisi_peta"] = "730	260"
+		Scene.Map["skala_peta"] = "30 30	30"
+	elseif namaprovinsi = "DKI JAKARTA" then
+		Scene.Map["posisi_peta"] = "1955	690"
+		Scene.Map["skala_peta"] = "85 85	85"
+	elseif namaprovinsi = "JABAR" then
+		Scene.Map["posisi_peta"] = "835	385"
+		Scene.Map["skala_peta"] = "40 40	40"
+	elseif namaprovinsi = "JAWA BARAT"  then
+		Scene.Map["posisi_peta"] = "835	385"
+		Scene.Map["skala_peta"] = "40 40	40"
+	elseif namaprovinsi = "JATENG+DIY" then
+		Scene.Map["posisi_peta"] = "750 500"
+		Scene.Map["skala_peta"] = "47 47 47"
+	elseif namaprovinsi = "JAWA TENGAH" then
+		Scene.Map["posisi_peta"] = "650	425"
+		Scene.Map["skala_peta"] = "40	40 40"
+	elseif namaprovinsi = "DI YOGYAKARTA" then
+		Scene.Map["posisi_peta"] = "750	600"
+		Scene.Map["skala_peta"] = "50	50 50"
+	elseif namaprovinsi = "JATIM" then
+		Scene.Map["posisi_peta"] = "405	460"
+		Scene.Map["skala_peta"] = "40 40	40"
+	elseif namaprovinsi = "JAWA TIMUR" then
+		Scene.Map["posisi_peta"] = "405	460"
+		Scene.Map["skala_peta"] = "40 40	40"
+		
+		
+	elseif namaprovinsi = "LUAR JAWA" then
+		Scene.Map["posisi_peta"] = "15	-10"
+		Scene.Map["skala_peta"] = "4 4 4"	
+	elseif namaprovinsi = "SUMATERA" then
+		Scene.Map["posisi_peta"] = "320 -60"
+		Scene.Map["skala_peta"] = "9 9 9"
+	elseif namaprovinsi = "NANGGROE ACEH DARUSSALAM" then
+		Scene.Map["posisi_peta"] = "650	-230"
+		Scene.Map["skala_peta"] = "15 15 15"
+	elseif namaprovinsi = "SUMATERA UTARA" then
+		Scene.Map["posisi_peta"] = "1205	-345"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "SUMATERA BARAT" then
+		Scene.Map["posisi_peta"] = "1100	-150"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "RIAU" then
+		Scene.Map["posisi_peta"] = "680	-140"
+		Scene.Map["skala_peta"] = "20	20 20"
+	elseif namaprovinsi = "JAMBI" then
+		Scene.Map["posisi_peta"] = "1300	-65"
+		Scene.Map["skala_peta"] = "40	40 40"
+	elseif namaprovinsi = "SUMATERA SELATAN" then
+		Scene.Map["posisi_peta"] = "945	-65"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "BENGKULU" then
+		Scene.Map["posisi_peta"] = "1145	60"
+		Scene.Map["skala_peta"] = "35 35	35"
+	elseif namaprovinsi = "LAMPUNG" then
+		Scene.Map["posisi_peta"] = "1080	215"
+		Scene.Map["skala_peta"] = "40	40 40"
+	elseif namaprovinsi = "KEP BANGKA BELITUNG" then
+		Scene.Map["posisi_peta"] = "615	-20"
+		Scene.Map["skala_peta"] = "25 25 25"
+	elseif namaprovinsi = "KEPULAUAN RIAU" then
+		Scene.Map["posisi_peta"] = "1095	-275"
+		Scene.Map["skala_peta"] = "40	40 40"
+		
+		
+	elseif namaprovinsi = "BALI NUSA" then
+		Scene.Map["posisi_peta"] = "260	640"
+		Scene.Map["skala_peta"] = "50 50	50"
+	elseif namaprovinsi = "NUSA TENGGARA BARAT" then
+		Scene.Map["posisi_peta"] = "10	340"
+		Scene.Map["skala_peta"] = "25	25 25"
+	elseif namaprovinsi = "NUSA TENGGARA TIMUR" then
+		Scene.Map["posisi_peta"] = "-175	340"
+		Scene.Map["skala_peta"] = "25	25 25"
+		
+		
+	elseif namaprovinsi = "KALIMANTAN" then
+		Scene.Map["posisi_peta"] = "105 -60"
+		Scene.Map["skala_peta"] = "11 11 11"
+	elseif namaprovinsi = "KALIMANTAN BARAT" then
+		Scene.Map["posisi_peta"] = "350	-130"
+		Scene.Map["skala_peta"] = "25	25 25"
+	elseif namaprovinsi = "KALIMANTAN TENGAH" then
+		Scene.Map["posisi_peta"] = "220	-55"
+		Scene.Map["skala_peta"] = "25	25 25"
+	elseif namaprovinsi = "KALIMANTAN SELATAN" then
+		Scene.Map["posisi_peta"] = "135	20"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "KALIMANTAN TIMUR" then
+		Scene.Map["posisi_peta"] = "50	-160"
+		Scene.Map["skala_peta"] = "25 25 25"
+		
+		
+	elseif namaprovinsi = "SULAWESI" then
+		Scene.Map["posisi_peta"] = "-120 -28"
+		Scene.Map["skala_peta"] = "14 14 14"
+	elseif namaprovinsi = "SULAWESI UTARA" then
+		Scene.Map["posisi_peta"] = "-420	-215"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "SULAWESI TENGAH" then
+		Scene.Map["posisi_peta"] = "-260	-90"
+		Scene.Map["skala_peta"] = "40	40 40"
+	elseif namaprovinsi = "SULAWESI SELATAN" then
+		Scene.Map["posisi_peta"] = "-210	150"
+		Scene.Map["skala_peta"] = "40	40 40"
+	elseif namaprovinsi = "SULAWESI TENGGARA" then
+		Scene.Map["posisi_peta"] = "-280	70"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "GORONTALO" then
+		Scene.Map["posisi_peta"] = "-320	-215"
+		Scene.Map["skala_peta"] = "30 30	30"
+	elseif namaprovinsi = "SULAWESI BARAT" then
+		Scene.Map["posisi_peta"] = "-160	0"
+		Scene.Map["skala_peta"] = "40	40 40"
+		
+		
+	elseif namaprovinsi = "LAINNYA" then
+		Scene.Map["posisi_peta"] = "15	-10"
+		Scene.Map["skala_peta"] = "4 4	4"
+	elseif namaprovinsi = "MALUKU" then
+		Scene.Map["posisi_peta"] = "-745	45"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "MALUKU UTARA" then
+		Scene.Map["posisi_peta"] = "-680	-220"
+		Scene.Map["skala_peta"] = "30	30 30"
+	elseif namaprovinsi = "PAPUA" then
+		Scene.Map["posisi_peta"] = "-845	40"
+		Scene.Map["skala_peta"] = "20	20 20"
+	elseif namaprovinsi = "PAPUA BARAT" then
+		Scene.Map["posisi_peta"] = "-660	-35"
+		Scene.Map["skala_peta"] = "20	20 20"
+	elseif namaprovinsi = "TOTAL" then
+		Scene.Map["posisi_peta"] = "15	-10"
+		Scene.Map["skala_peta"] = "4 4 4"				
+	else
+		Scene.Map["posisi_peta"] = "15	-10"
+		Scene.Map["skala_peta"] = "4 4 4"	
+	end if
+	
+	'animasi titik gelombang pointer
+	SendCommand("RENDERER*STAGE*DIRECTOR*INOUT-POINTER SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*INOUT-POINTER CONTINUE")
+	
+	'judul provinsi
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET judul_nama_provinsi = " & namaprovinsi)
+	SendCommand("RENDERER*STAGE*DIRECTOR*judul_nama_provinsi SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*judul_nama_provinsi CONTINUE")	
+	
+	
+	'TSET
+	
+	if Scene.Map["posisi"] = "awal" then
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET posisi_peta_akhir = " & Scene.Map["posisi_peta"])
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET skala_peta_akhir = " & Scene.Map["skala_peta"])
+		
+		SendCommand("RENDERER*STAGE*DIRECTOR*KOORDINAT_PETA CONTINUE")
+		SendCommand("RENDERER*STAGE*DIRECTOR*KOORDINAT_PETA_EXITPOLL CONTINUE")
+		
+	else
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET posisi_peta_awal = " & Scene.Map["posisi_peta"])
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET skala_peta_awal = " & Scene.Map["skala_peta"])
+
+		SendCommand("RENDERER*STAGE*DIRECTOR*KOORDINAT_PETA CONTINUE REVERSE")
+		SendCommand("RENDERER*STAGE*DIRECTOR*KOORDINAT_PETA_EXITPOLL CONTINUE REVERSE")
+		
+	end if
+	
+end sub
+
+'================ END SEBARAN SUARA =======================
+
+'===== BEGIN STABILITAS SUARA =======
+'
+sub StabilitasSuaraDown()
+	
+	'jumlah kandidat
+	jmlkandidat_li = GetParameterInt("StabilitasSuara_Jumlah_Kandidat")
+	indexTotalSuara_li = GetParameterInt("StabilitasSuara_Index_TotalSuara")
+	indexTPS_li = GetParameterInt("StabilitasSuara_Index_TPS")
+	indexPartisipasi_li = GetParameterInt("StabilitasSuara_Index_Partisipasi")
+	
+	'lokasi file line graphic
+	alamatfile = GetParameterString("Root_Path") & GetParameterString("StabilitasSuara")		
+	'println "alamatfile : " & alamatfile
+
+	'ambil isi file
+	System.LoadTextFile(alamatfile, isifile)		
+	println "isifile -> " & isifile
+
+	'ambil data pisahkan dengan baris baru
+	isifile.split(Chr(10), IsiKandidat)	
+
+	'cek baris kosong		
+	for j = 0 to IsiKandidat.ubound - 1
+		if IsiKandidat[j] <> "" then totalbaris_li = j
+	next
+	'println "(total index) = " & totalbaris_li
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET JUDUL = STABILITAS SUARA")
+
+	'ambil data terakhir
+	IsiKandidat[totalbaris_li].split(";", strISIpersen)	
+	'kolom index ke 4 untuk total suara masuk
+	scene.FindContainer("datamasuk").geometry.text = strISIpersen[indexTotalSuara_li] & " %"
+	
+	''cmd = "RENDERER*FUNCTION*DataPool*Data SET DATA_MASUK = " & strISIpersen[indexTotalSuara_li]
+	''SendCommand(cmd)
+
+	
+	'---------------------------------
+	'untuk nilai jika dibawah 10 baris
+	if IsiKandidat.ubound <= 6 then
+		'println "IsiKandidat.ubound : " & IsiKandidat.ubound
+			
+			'jika datanya masih kosong, maka reset semua nilai line ke 0
+			if 	IsiKandidat[0] = "" then
+				'println "dibawah 6 tapi kosong"
+				'9 itu jmlh baris plugin GraphLine yg digunakan
+				for semuabaris = 0 to 5
+					
+					'lakukan sebanyak jumlah kandidat kurang 1 (hitung index)
+					for i = 0 to jmlkandidat_li - 1
+						send = "RENDERER*TREE*$Graph" & i & "*GEOM*X" & semuabaris & " SET 0"
+						sendcommand(send)
+						'println send
+						send = "RENDERER*TREE*$Graph" & i & "*GEOM*Y" & semuabaris & " SET 0"
+						sendcommand(send)
+						'println send
+					next
+					
+					scene.FindContainer("TPS-" & semuabaris).geometry.text = Cstr(semuabaris + 1)
+					'println "TPS-" & semuabaris & " = " & Cstr(semuabaris + 1)
+					'scene.FindContainer("datamasuk").geometry.text = "0.00 %"
+					
+					''cmd = "RENDERER*FUNCTION*DataPool*Data SET DATA_MASUK = 0"
+					''SendCommand(cmd)
+				next
+				
+			else
+					
+				'jika datanya yang masuk masih dibawah 5
+				kelipatansepuluhawal = 0
+				'println "dibawah 6 tapi isi"
+				'println "IsiKandidat.ubound : " & IsiKandidat.ubound
+				for	semuabarisawal = 0 to totalbaris_li
+					IsiKandidat[semuabarisawal].split(";", strISI)
+					'println "jmlkandidat_li : " & jmlkandidat_li
+					
+					'isi nilai suara perkandidat
+					'lakukan sebanyak jumlah kandidat kurang 1 (hitung index)
+					for i = 0 to jmlkandidat_li - 1
+						send = "RENDERER*TREE*$Graph" & i & "*GEOM*Y" & semuabarisawal & " SET " & strISI[i]
+						sendcommand(send)
+						'println send
+						
+						'isi jarak tiap 10 titik
+						send = "RENDERER*TREE*$Graph" & i & "*GEOM*X" & semuabarisawal & " SET " & kelipatansepuluhawal
+						sendcommand(send)
+						'println send
+
+					next
+					
+					'isi nilai tps masuk perkandidat nilai tiap 10 titik mengikuti nilai terakhir tiap baris
+					'scene.FindContainer("nilai1").geometry.text = Cstr(0)
+					scene.FindContainer("TPS-" & semuabarisawal).geometry.text = strISI[indexTPS_li]
+					'println "TPS-" & semuabarisawal & " = " & strISI[indexTPS_li]
+
+					kelipatansepuluhawal = kelipatansepuluhawal + 18
+					
+					'println "kelipatansepuluhawal -> " & kelipatansepuluhawal
+					if 	kelipatansepuluhawal >= 91 then
+						kelipatansepuluhawal = 0
+					end if
+				next
+			end if
+	end if
+
+	if IsiKandidat.ubound > 6 then
+		'println "diatas 6"
+		kelipatansepuluh = 0
+		tiapkandidat = 0
+		'println "IsiKandidat.ubound ---------- 1 : " & IsiKandidat[IsiKandidat.ubound - 1]
+		
+		'untuk ambil 5 nilai terakhir
+		for semuabaris = totalbaris_li - 5 to totalbaris_li
+			'println "baris yang diambil = " & IsiKandidat[semuabaris]
+			IsiKandidat[semuabaris].split(";", strISI)
+						
+			'isi keseluruhan tiap baris			
+			for i = 0 to jmlkandidat_li - 1
+				send = "RENDERER*TREE*$Graph" & i & "*GEOM*Y" & tiapkandidat & " SET " & strISI[i]
+				sendcommand(send)
+				'println send
+				'isi jarak tiap 5 titik
+				send = "RENDERER*TREE*$Graph" & i & "*GEOM*X" & tiapkandidat & " SET " & kelipatansepuluh 
+				sendcommand(send)
+				'println send
+			next
+				
+			'isi nilai tps masuk perkandidat nilai tiap 10 titik mengikuti nilai terakhir tiap baris
+			scene.FindContainer("TPS-" & tiapkandidat).geometry.text = strISI[indexTPS_li]
+			'println "TPS-" & tiapkandidat & " = " & strISI[indexTPS_li]
+			
+			'println "tiapkandidat -> " & tiapkandidat
+			
+			tiapkandidat = tiapkandidat + 1
+			if tiapkandidat > 6 then
+				tiapkandidat = 0
+			end if
+				
+			kelipatansepuluh = kelipatansepuluh + 18
+			if kelipatansepuluh >= 91 then
+				kelipatansepuluh = 0
+			end if
+		next
+	end if
+end sub
+
+
+'===== END STABILITAS SUARA =======
+
+
+'================ BEGIN PEROLEHAN SUARA =======================
+
+sub Sebaran_Perolehan_Suara(lokasisurvei as string)
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Root_Path") & lokasisurvei
+	System.LoadTextFile(lokasifile, strlokasifile)
+	'println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrisibarisdata)
+	println "strlokasifile : " & strlokasifile
+
+	for i = 0 to arrisibarisdata.ubound
+		arrisibarisdata[i].split(";", arrstrisibaris) 
+		JudulGraphic(arrstrisibaris[0], arrstrisibaris[1])
+		CekNilai(arrstrisibaris[0], arrstrisibaris[1])
+		Datamasuk(arrstrisibaris[0], arrstrisibaris[1])
+		'Partisipasi(arrstrisibaris[0], arrstrisibaris[1])
+	next		
+
+	'judul graphic
+	'SendCommand("RENDERER*FUNCTION*DataPool*Data SET judul_graphic = SEBARAN SUARA MENURUT WILAYAH")
+end sub
+
+'================ END PEROLEHAN SUARA =======================
+
+sub Exitpoll(lokasisurvei as string)
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Root_Path") & lokasisurvei
+	System.LoadTextFile(lokasifile, strlokasifile)
+	'println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrisibarisdata)
+	println "strlokasifile : " & strlokasifile
+
+	for i = 0 to arrisibarisdata.ubound
+		arrisibarisdata[i].split(";", arrstrisibaris) 
+		CekNilai(arrstrisibaris[0], arrstrisibaris[1])
+		CekBatangNilai(arrstrisibaris[0], arrstrisibaris[1])
+		keterangan(arrstrisibaris[0], arrstrisibaris[1])
+	next		
+end sub
+
+sub ExitpollKelompok(lokasisurvei as string)
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Root_Path") & lokasisurvei
+	System.LoadTextFile(lokasifile, strlokasifile)
+	'println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrisibarisdata)
+	println "strlokasifile : " & strlokasifile
+
+	for i = 0 to arrisibarisdata.ubound
+		arrisibarisdata[i].split(";", arrstrisibaris) 
+		CekNilai2(arrstrisibaris[0], arrstrisibaris[1])
+		CekNilai3(arrstrisibaris[0], arrstrisibaris[2])
+		CekNilai4(arrstrisibaris[0], arrstrisibaris[3])
+		CekNilai5(arrstrisibaris[0], arrstrisibaris[4])
+		CekNilai6(arrstrisibaris[0], arrstrisibaris[5])
+
+		CekBatangNilai2(arrstrisibaris[0], arrstrisibaris[1])
+		CekBatangNilai3(arrstrisibaris[0], arrstrisibaris[2])
+		CekBatangNilai4(arrstrisibaris[0], arrstrisibaris[3])
+		CekBatangNilai5(arrstrisibaris[0], arrstrisibaris[4])
+		CekBatangNilai6(arrstrisibaris[0], arrstrisibaris[5])
+	next		
+end sub
+
+sub ExitpollZona(lokasisurvei as string, propinsi as string)
+	dim kunci as string
+	'cari kata kunci dari nama propinsi
+	kunci = ConvertZona(propinsi)
+	
+	'baca isi file kumpulan alamat file
+	lokasifile = GetParameterString("Root_Path") & lokasisurvei
+	System.LoadTextFile(lokasifile, strlokasifile)
+	'println "lokasifile : " & lokasifile
+	
+	'pisahkan alamat file perbaris kedalam array
+	strlokasifile.split(Chr(10), arrisibarisdata)
+	println "strlokasifile : " & strlokasifile
+
+	for i = 0 to arrisibarisdata.ubound
+		'println "kunci : " & kunci
+		arrisibarisdata[i].split(";", arrstrisibaris) 
+		CekNilaiZonaA(arrstrisibaris[0], arrstrisibaris[1], "NILAI" & kunci)
+		CekNilaiZonaB(arrstrisibaris[0], arrstrisibaris[2], "NILAI" & kunci)
+		CekNilaiZonaC(arrstrisibaris[0], arrstrisibaris[3], "NILAI" & kunci)
+		keteranganZona(arrstrisibaris[0], arrstrisibaris[1], "KETERANGAN" & kunci)
+	next		
+end sub
+
+Function ConvertZona(zona as string) as string
+	if zona.Find("SUMATERA") >= 0 then
+		ConvertZona = "1"
+	elseif zona.Find("DKI+BANTEN") >= 0 then
+		ConvertZona = "2"
+	elseif zona.Find("JABAR") >= 0 then
+		ConvertZona = "3"				
+	elseif zona.Find("JATENG+DIY") >= 0 then
+		ConvertZona = "4"	
+	elseif zona.Find("JATIM") >= 0 then
+		ConvertZona = "5"
+	elseif zona.Find("BALI") >= 0 then
+		ConvertZona = "6"		
+	elseif zona.Find("KALIMANTAN") >= 0 then
+		ConvertZona = "7"		
+	elseif zona.Find("SULAWESI") >= 0 then
+		ConvertZona = "8"		
+	elseif zona.Find("LAINNYA") >= 0 then
+		ConvertZona = "9"			
+	end if
+End Function
+
+Sub keteranganZona(katakunci as string, nilai as string, indexzona as string)
+	if  katakunci = indexzona then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET KETERANGAN = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+
+Sub CekNilaiZonaA(katakunci as string, nilai as string, indexzona as string)
+	if katakunci = indexzona then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET NILAIA = " & nilai
+		SendCommand(cmd)
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_NILAIA = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+
+Sub CekNilaiZonaB(katakunci as string, nilai as string, indexzona as string)
+	if katakunci = indexzona then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET NILAIB = " & nilai
+		SendCommand(cmd)
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_NILAIB = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+
+Sub CekNilaiZonaC(katakunci as string, nilai as string, indexzona as string)
+	if katakunci = indexzona then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET NILAIC = " & nilai
+		SendCommand(cmd)
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_NILAIC = " & nilai
+		SendCommand(cmd)		
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+
+
+
+
+
+
+
+
+
+
+
+
+Sub keterangan(katakunci as string, nilai as string)
+	if katakunci.Find("KETERANGAN") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & " = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+
+
+
+
+'===== BEGIN UNIVERSAL ====
+
+Sub CekNilai(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & " = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+Sub CekNilai2(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & "A = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+Sub CekNilai3(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & "B = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+Sub CekNilai4(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & "C = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+Sub CekNilai5(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & "D = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+Sub CekNilai6(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & "E = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+'========================================================'
+Sub CekBatangNilai(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & " = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+Sub CekBatangNilai2(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & "A = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+Sub CekBatangNilai3(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & "B = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+Sub CekBatangNilai4(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & "C = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+Sub CekBatangNilai5(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & "D = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+Sub CekBatangNilai6(katakunci as string, nilai as string)
+	if katakunci.Find("NILAI") >= 0 then
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET BATANG_" & katakunci & "E = " & Cdbl(nilai)
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+end sub
+
+Sub Datamasuk(katakunci as string, nilai as string)
+	if katakunci.Find("DATA_MASUK") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & " = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+
+Sub JudulGraphic(katakunci as string, nilai as string)
+	if katakunci.Find("JUDUL") >= 0 then	
+		cmd = "RENDERER*FUNCTION*DataPool*Data SET " & katakunci & " = " & nilai
+		SendCommand(cmd)
+	else
+		Scene.FindContainer(katakunci).Geometry.Text = nilai	
+	end if
+end sub
+
+sub HomeWahana()
+	dim i as integer
+	'tarik semua exitpoll dan QC
+	for i = 1 to 33
+		Scene.FindContainer("GRAPHIC_" & i).Active = False
+		SendCommand("RENDERER*STAGE*DIRECTOR*GRAPHIC_" & i & " SHOW 0")
+	next
+	
+	Scene.FindContainer("CREATIVE-PLACEMENT").Active = True
+	
+	SendCommand("RENDERER*STAGE*DIRECTOR*3DMODEL-CAPRES SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-KANAN SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-KANAN CONTINUE")	
+	SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-KIRI SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-KIRI CONTINUE")	
+	SendCommand("RENDERER*STAGE*DIRECTOR*HOME-SCREEN SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*HOME-SCREEN CONTINUE")	
+		
+end sub
+
+
+Sub ShowGraphic(pilihangraphic as integer, propinsi as string)
+	dim i as integer
+	for i = 1 to 33
+		Scene.FindContainer("GRAPHIC_" & i).Active = False
+		SendCommand("RENDERER*STAGE*DIRECTOR*GRAPHIC_" & i & " SHOW 0")
+	next
+	
+	if pilihangraphic = 0 then
+		'iklan
+		Scene.FindContainer("CREATIVE-PLACEMENT").Active = True	
+	else
+		'Scene.FindContainer("CREATIVE-PLACEMENT").Active = False	
+		SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-TENGAH-3 SHOW 0")
+		SendCommand("RENDERER*STAGE*DIRECTOR*CP-LAYAR-TENGAH-3 CONTINUE")			
+	end if	
+
+	Scene.FindContainer("GRAPHIC_" & pilihangraphic).Active = true
+	SendCommand("RENDERER*STAGE*DIRECTOR*GRAPHIC_" & pilihangraphic & " SHOW 0")
+	SendCommand("RENDERER*STAGE*DIRECTOR*GRAPHIC_" & pilihangraphic & " CONTINUE")	
+
+	'capres kanan kiri
+	if pilihangraphic = 1 or pilihangraphic = 30 then
+		SendCommand("RENDERER*STAGE*DIRECTOR*3DMODEL-CAPRES SHOW 0")
+		'println "pilihangraphic 1: " & pilihangraphic
+	else
+		SendCommand("RENDERER*STAGE*DIRECTOR*3DMODEL-CAPRES SHOW 0")
+		SendCommand("RENDERER*STAGE*DIRECTOR*3DMODEL-CAPRES CONTINUE")
+		'println "pilihangraphic <> 1 : " & pilihangraphic
+	end if
+
+		
+	if pilihangraphic = 1 then
+	
+		'PEROLEHAN SUARA 
+		Sebaran_Perolehan_Suara(GetParameterString("PerolehanSuara"))
+
+	elseif pilihangraphic = 2 then
+
+		' BEGIN SEBARAN SUARA 
+		lokasidanskala_peta(propinsi)
+		CekNilai_SebaranSuara(propinsi)
+
+		SendCommand("RENDERER*STAGE*DIRECTOR*judul_nama_provinsi SHOW 0")	
+		SendCommand("RENDERER*STAGE*DIRECTOR*judul_nama_provinsi CONTINUE")	
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET JUDUL = SEBARAN SUARA MENURUT WILAYAH")
+
+	elseif pilihangraphic = 3 then
+
+		'BEGIN STABILITAS
+		StabilitasSuaraDown()
+
+	elseif pilihangraphic = 4 then
+
+		'BEGIN KELOMPOK PENDIDIKAN
+		Exitpoll(GetParameterString("01_Kelompok_Pendidikan"))
+		
+	elseif pilihangraphic = 5 then
+		
+		'BEGIN KELOMPOK USIA
+		Exitpoll(GetParameterString("01_Kelompok_Usia"))
+						
+	elseif pilihangraphic = 6 then
+
+		'01_Kinerja_Demokrasi 
+		Exitpoll(GetParameterString("01_Kinerja_Demokrasi"))
+			
+	elseif pilihangraphic = 7 then
+
+		'01_Pemilu_Jurdil
+		Exitpoll(GetParameterString("01_Pemilu_Jurdil"))
+
+	elseif pilihangraphic = 8 then
+
+		'01_Tren_Educ
+		ExitpollKelompok(GetParameterString("01_Tren_Educ"))
+		
+		pilih = "GRAPHIC_8"
+
+	elseif pilihangraphic = 9 then
+	
+		
+
+		'01_Tren_Usia
+		ExitpollKelompok(GetParameterString("01_Tren_Usia"))
+		
+		pilih = "GRAPHIC_9"
+
+	elseif pilihangraphic = 10 then
+
+		'02_Atribut
+		Exitpoll(GetParameterString("02_Atribut"))
+		
+	elseif pilihangraphic = 11 then
+	
+		'02_IklanTV
+		Exitpoll(GetParameterString("02_IklanTV"))
+
+	elseif pilihangraphic = 12 then
+
+		'02_PilihanByAtribut
+		ExitpollKelompok(GetParameterString("02_PilihanByAtribut"))
+
+	elseif pilihangraphic = 13 then
+
+		'02_PilihanByIklanTV
+		ExitpollKelompok(GetParameterString("02_PilihanByIklanTV"))
+
+	elseif pilihangraphic = 14 then
+
+		'02_PilihanByTimses
+		ExitpollKelompok(GetParameterString("02_PilihanByTimses"))
+		
+	elseif pilihangraphic = 15 then
+
+		'02_Timses
+		Exitpoll(GetParameterString("02_Timses"))		
+
+	elseif pilihangraphic = 16 then
+
+		'03_Debat5
+		Exitpoll(GetParameterString("03_Debat5"))		
+
+	elseif pilihangraphic = 17 then
+
+		'03_DebatAll
+		Exitpoll(GetParameterString("03_DebatAll"))		
+
+	elseif pilihangraphic = 18 then
+
+		'03_PilihanByDebat5
+		ExitpollKelompok(GetParameterString("03_PilihanByDebat5"))		
+
+	elseif pilihangraphic = 19 then
+
+		'03_PilihanByDebatAll
+		ExitpollKelompok(GetParameterString("03_PilihanByDebatAll"))		
+
+	elseif pilihangraphic = 20 then
+
+		'04_PilihanByAgama
+		ExitpollKelompok(GetParameterString("04_PilihanByAgama"))		
+
+	elseif pilihangraphic = 21 then
+
+		'04_PilihanByDesaKota
+		ExitpollKelompok(GetParameterString("04_PilihanByDesaKota"))		
+
+	elseif pilihangraphic = 22 then
+
+		'04_PilihanByEduc
+		ExitpollKelompok(GetParameterString("04_PilihanByEduc"))		
+
+	elseif pilihangraphic = 23 then
+
+		'04_PilihanByGender
+		ExitpollKelompok(GetParameterString("04_PilihanByGender"))		
+
+	elseif pilihangraphic = 24 then
+
+		'04_PilihanByIncome
+		ExitpollKelompok(GetParameterString("04_PilihanByIncome"))		
+
+	elseif pilihangraphic = 25 then
+
+		'04_PilihanByNuMuh
+		ExitpollKelompok(GetParameterString("04_PilihanByNuMuh"))		
+
+	elseif pilihangraphic = 26 then
+
+		'04_PilihanByPartai
+		ExitpollKelompok(GetParameterString("04_PilihanByPartai"))
+		pilih = "GRAPHIC_26"		
+
+	elseif pilihangraphic = 27 then
+
+		'04_PilihanByReligius
+		ExitpollKelompok(GetParameterString("04_PilihanByReligius"))		
+
+	elseif pilihangraphic = 28 then
+
+		'04_PilihanByUsia
+		ExitpollKelompok(GetParameterString("04_PilihanByUsia"))		
+		pilih = "GRAPHIC_28"
+
+	elseif pilihangraphic = 29 then
+
+		'04_PilihanByZona
+		ExitpollZona(GetParameterString("04_PilihanByZona"), propinsi)		
+		lokasidanskala_peta(propinsi)
+		
+	elseif pilihangraphic = 30 then
+
+		'00_Capres_Pilihan
+		Exitpoll(GetParameterString("00_Capres_Pilihan"))		
+
+	elseif pilihangraphic = 0 then		
+		HomeWahana()
+		
+	end if
+
+end sub
+
+'===== END UNIVERSAL ====
+
+sub OnLButtonDown()
+	ShowGraphic(GetParameterInt("PilihanGraphic"), "KALIMANTAN")
+end sub
+
+sub OnLButtonUp()
+end sub
+
+
+
+
+ 

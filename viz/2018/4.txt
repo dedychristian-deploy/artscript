@@ -1,0 +1,161 @@
+'sub OnInitPlugin()
+'	RegisterPlugin("OmLi_Follower")
+'	RegisterPluginFolder("ScriptPlugins")
+'	RegisterPluginType(PLUGIN_TYPE_FUNCTION)
+'end sub
+
+dim master = Scene.findcontainer("Master")
+Dim spd as double
+dim x1, x2 as boolean
+
+dim rads, degs as double
+
+sub OnInitParameters()
+
+	RegisterParameterDouble("speed", "speed :" , 5 , 1 , 30)
+	RegisterParameterContainer("target_con","Target")
+end sub
+
+
+
+sub OnExecPerField()
+
+
+'	if master.position.x < this.position.x then
+'
+'		this.position.x = this.position.x  - ((this.position.x - master.position.x)/spd)
+'			'this.rotation.z = 90
+'
+'
+'	elseif master.position.x > this.position.x then
+'		this.position.x = this.position.x  + ((master.position.x - this.position.x)/spd)		 
+'			'this.rotation.z = -90
+'
+'	end if
+'
+'	if master.position.y < this.position.y then
+'
+'		this.position.y = this.position.y  - ((this.position.y - master.position.y)/spd)
+'
+'
+'	elseif master.position.y > this.position.y then
+'		this.position.y = this.position.y  + ((master.position.y - this.position.y)/spd)
+'		
+'	end if
+	
+'	if master.rotation.z < this.rotation.z then
+'
+'		this.rotation.z = this.rotation.z  - ((this.rotation.z - master.rotation.z)/spd)
+'
+'	elseif master.rotation.z > this.rotation.z then
+'		this.rotation.z = this.rotation.z  + ((master.rotation.z - this.rotation.z)/spd)
+'
+'	end if
+'if System.map["stats"] = true then 
+'println System.map["status2"]
+
+
+if System.map["status6"] = "hidup" then
+	'asd()
+elseif System.map["status6"] = "balik" then
+	asd()
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET FALSE")
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET TRUE")
+end if
+
+if System.map["status6"] = "reset" then 
+	this.rotation.z = -90	
+System.map["status6"] = "hidup"
+end if
+'asd()
+'else
+'asd()
+'end if
+
+'asd()
+	
+	
+
+end sub
+
+sub OnMoveRelative6DOF(button As Integer, pos As Vertex, rot As Vertex)
+'	master=GetParameterContainer("target_con")
+'	spd = GetParameterDouble("speed")
+'	
+'	if master.position.x < this.position.x then
+'
+'	this.position.x = this.position.x  - ((this.position.x - master.position.x)/spd)
+'			'this.rotation.z = 90
+'
+'
+'	elseif master.position.x > this.position.x then
+'		this.position.x = this.position.x  + ((master.position.x - this.position.x)/spd)		 
+'			'this.rotation.z = -90
+'
+'	end if
+'
+'	if master.position.y < this.position.y then
+'
+'		this.position.y = this.position.y  - ((this.position.y - master.position.y)/spd)
+'
+'
+'	elseif master.position.y > this.position.y then
+'		this.position.y = this.position.y  + ((master.position.y - this.position.y)/spd)
+'		
+'	end if
+'
+'	rads =  Atan2((master.position.x - this.position.x), (master.position.y - this.position.y))
+'	degs = (rads*180)/(3.14)
+'	println  degs
+'	
+'	this.rotation.z = -degs
+	
+end sub
+
+sub asd()
+
+	master=GetParameterContainer("target_con")
+	spd = GetParameterDouble("speed")
+	
+	if master.position.x < this.position.x then
+
+	this.position.x = this.position.x  - ((this.position.x - master.position.x)/spd)
+			'this.rotation.z = 90
+
+
+	elseif master.position.x > this.position.x then
+		this.position.x = this.position.x  + ((master.position.x - this.position.x)/spd)		 
+			'this.rotation.z = -90
+
+	end if
+
+	if master.position.y < this.position.y then
+
+		this.position.y = this.position.y  - ((this.position.y - master.position.y)/spd)
+
+
+	elseif master.position.y > this.position.y then
+		this.position.y = this.position.y  + ((master.position.y - this.position.y)/spd)
+		'System.map["stats"] = false
+		
+	end if
+
+	rads =  Atan2((master.position.x - this.position.x), (master.position.y - this.position.y))
+	degs = (rads*180)/(3.14)
+	this.rotation.z = -degs
+	
+'if System.map["status"] = "hidup" then
+'	println System.map["status"]
+'else
+
+'if System.map["status"] = "reset" then 
+'	this.rotation.z = -90	
+'	'println this.rotation.z
+'
+'else
+
+'end if
+	
+end sub
+'
+

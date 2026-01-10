@@ -1,0 +1,132 @@
+dim lc_cont as container
+dim lc_cont2 as container
+dim lc_lapangan, target as container
+dim drag_active as boolean=false
+dim editable as boolean=false
+dim kec_ld, batas_ld, jml_qc_image as integer	
+dim cmd as string
+
+lc_lapangan = Scene.FindContainer("noname1")
+System.map["stats"] = false
+
+
+
+sub OnLButtonDown()
+	drag_active=true
+	System.map["stats"] = true
+	System.map["status7"] = "hidup"
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET FALSE")
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET TRUE")
+	'println this.nextcontainer.name
+end sub
+
+sub OnMoveRelative6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	dim lx,ly,lz as double
+	
+	lx = pos[0]
+	ly = pos[1]
+	lz = 0.0
+
+'println "ini " & drag_active			
+if drag_active = true  then
+			'System.map["stats"] = true			
+			ubahDOF(lx,ly)
+			println "you're in a field" & pos
+		end if
+end sub
+
+sub ubahDOF(a As double,b As double)
+	dim lx,ly,lz as double
+	
+	lx = a
+	ly = b
+	lz = 0.0
+
+			
+'if drag_active = true  then
+			this.position.xyz += cvertex(lx,ly,0)
+			sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Player*SCRIPT INVOKE asd")
+		'end if
+end sub
+
+
+
+sub OnInit()
+	kec_ld = 10
+	'position.x = 0
+end sub
+
+
+sub OnExecPerField()
+
+if System.map["status7"] = "balik"  then	
+	'println drag_active
+	'untuk X
+	if this.position.x < 0.0 then
+		this.position.x += 2
+		if this.position.x > -0.5 then	
+			this.position.x = 0.0
+			println 
+		end if	
+	end if
+	if this.position.x > 0.0 then
+			this.position.x -= 2	
+			if this.position.x < 0.5 then	
+				this.position.x = 0.0
+				println this.position.x 
+			end if	
+	end if
+	
+	if this.position.y < 0.0 then
+		this.position.y += 2	
+		if this.position.y > -0.5 then	
+			this.position.y = 0.0
+
+		end if	
+	end if
+	if this.position.y > 0.0 then
+			this.position.y -= 2	
+			if this.position.y < 0.5 then	
+				this.position.y = 0.0
+			end if	
+	end if
+	'println scene.findContainer("$TEAM-K$Player").position.y
+	target=GetParameterContainer("target_con")
+	if target.position.x <= 0.1  then	
+	drag_active = false
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET TRUE")
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET FALSE")			
+	
+	System.map["status7"] = "reset"
+	'println "dedy" & System.map["status"]
+	
+	end if	
+	else
+end if		
+
+end sub
+
+sub OnLButtonUp()
+    drag_active=false
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET TRUE")
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET FALSE")	
+'	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET FALSE")
+'	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET TRUE")
+	
+	'System.map["status"] = "mati"
+end sub
+
+sub OnInitParameters()
+	RegisterParameterContainer("target_con","Target")
+end sub
+
+sub OnButtonUp6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	drag_active=false
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET TRUE")
+	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET FALSE")	
+'	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Idle*ACTIVE SET FALSE")
+'	sendCommand("RENDERER*TREE*$"&this.parentcontainer.name&"$Run*ACTIVE SET TRUE")
+	
+	'System.map["status"] = "mati"
+end sub
+

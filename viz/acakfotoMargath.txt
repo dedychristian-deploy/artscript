@@ -1,0 +1,30 @@
+dim cmd as string
+dim a, jumlahimage as integer
+dim lokasifile, namafile as string
+dim arrisifolder as Array[String] 
+
+sub OnLButtonDown()
+
+	lokasifile = GetParameterString("pathFolder")
+	namafile = GetParameterString("namafile")
+	jumlahimage = GetParameterInt("jumlahimage")
+	
+	arrisifolder = System.GetDirectoryContent(lokasifile, "*.jpg" ) 
+	
+	for a = 1 to jumlahimage
+		
+		cmd = "RENDERER*TREE*$image" & a & "*FUNCTION*ControlImage*input SET " & lokasifile & namafile & a &".jpg" 			
+		SendCommand(cmd)
+			
+	next
+			
+end sub
+
+Sub OnInitParameters()
+	RegisterParameterString("pathFolder", "Path Folder", "E:\\Gambar\\MARGATH\\", 50, 256, "")
+	RegisterParameterInt("jumlahimage", "Jumlah Image", 5, 0, 12)
+	RegisterParameterString("namafile", "nama file", "IMAGE", 50, 50, "")	
+end sub
+
+
+

@@ -1,0 +1,103 @@
+dim counter as integer
+dim btn_direction 	as array[string]
+dim btn_action 	as array[string]
+dim is_direction , is_action as string
+dim ib_start , ib_pause , ib_continue, ib_reset as boolean
+
+btn_direction.push(" LEFT ")
+btn_direction.push(" RIGHT ")
+btn_direction.push(" UP ") 
+btn_direction.push(" DOWN ") 
+
+btn_action.push(" START ") 
+btn_action.push(" PAUSE ") 
+btn_action.push(" RESET ") 
+
+sub OnInitParameters()
+	RegisterRadioButton( "reg_direction" , "Scrolling Direction",1, btn_direction) 
+	RegisterParameterDouble( "reg_Xinc" , "Position Increment",1.0, 1.0, 100.0 )
+	RegisterRadioButton( "reg_action" , "Action",1, btn_action)
+end sub 
+
+sub p_getdirection()
+	is_direction	= btn_direction[GetParameterInt("reg_direction")]	
+	if is_direction = " LEFT " then
+		this.Position.x = this.Position.x - GetparameterDouble("reg_Xinc")
+	elseif is_direction = " RIGHT " then
+		this.Position.x = this.Position.x + GetparameterDouble("reg_Xinc")
+	elseif is_direction = " UP " then
+		this.Position.y = this.Position.y + GetparameterDouble("reg_Xinc")
+	elseif is_direction = " DOWN " then
+		this.Position.y = this.Position.y - GetparameterDouble("reg_Xinc")
+	end if	
+end sub
+
+
+sub P_buttonAction()
+	is_action	= btn_action[GetParameterInt("reg_action")]		
+	if is_action = " START " then
+		ib_start = true
+	elseif is_action = " PAUSE " then		
+		ib_start = false
+	elseif is_action = " RESET " then
+		p_reset true		
+	end if	
+	
+end sub
+ 
+sub p_start()
+	ib_start = true
+end sub
+
+sub p_pause()
+	ib_start = false
+end sub
+
+sub p_reset( ab_val as boolean)
+	
+	ib_reset = ab_val
+	if ib_reset then
+		ib_reset = false
+		ib_start = false
+		if is_direction = " LEFT " then
+			this.Position.x = 900
+		elseif is_direction = " RIGHT " then
+			this.Position.x = -2000
+		elseif is_direction = " UP " then
+			this.Position.y = -500
+		elseif is_direction = " DOWN " then
+			this.Position.y = 500
+		end if	
+	end if
+end sub
+
+sub p_forcetoreset()
+	ib_start = false
+	p_getdirection()
+	p_reset( true)
+end sub
+
+sub OnExecPerField()
+	
+	if ib_start then
+		p_getdirection()
+	end if 
+	
+	
+end sub 
+
+sub OnParameterChanged(parameterName As String)
+	P_buttonAction()
+end sub
+
+
+sub OnLButtonUp()
+'	dim cca  as container
+'	cca = Scene.FindContainer("C_DoScrolling").ChildContainer
+'	deleteChildren
+end sub
+
+sub OnLButtonDown()
+end sub
+
+

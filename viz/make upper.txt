@@ -1,0 +1,7 @@
+		waktu_ls = MCRBardata[ii_counter].TypeWaktu
+		waktu_ls.MakeUpper()
+		Scene.FindContainer( "NAMA_DAERAH" ).geometry.text	= MCRBardata[ii_counter].NamaKota
+		Scene.FindContainer( "WAKTU_IMSAKIYAH" ).geometry.text	= waktu_ls
+		Scene.FindContainer( "JAM_IMSAKIYAH" ).geometry.text	= MCRBardata[ii_counter].WaktuAdzan & " " & MCRBardata[ii_counter].ZonaKota
+		
+		

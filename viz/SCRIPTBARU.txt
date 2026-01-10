@@ -1,0 +1,391 @@
+dim arrRowAllSOCMED as array[string]
+dim aa,bb,cc as array[string]
+dim strRowAllSOCMED as array[string]
+dim fileAllSOCMED as string
+dim  strDataAllSOCMED as string
+dim strDataBarisSOCMED as string
+dim tandaAkhir1,tandaAkhir2,tandaAkhir3 as container
+dim  AllSOCMEDcounter as integer
+dim a as string
+dim b,status1 as integer
+Dim komentar1,komentar2,komentar3,ab_val,status as boolean
+Dim sosmedlist,sosmedlist1 As String
+dim ib_start , ib_pause , ib_continue, ib_reset as boolean
+
+
+
+sub OnInitParameters()
+	
+	RegisterParameterString("_windowspath", "Windows Path", "\\\\192.168.16.160\\website$\\socialnetwork\\", 60,100, "")
+	RegisterParameterString("AllSOCMED", "Data Social Media", "wide_shot_socialnetwork.txt", 40,100, "")
+
+end sub
+
+sub cetak()
+	println "cetak"
+	reset()
+end sub
+
+
+'TAMBAHAN SCRIPT
+
+
+
+
+sub bacaDataAwal1()
+
+for i = 0 to arrRowAllSOCMED.ubound
+				
+				arrRowAllSOCMED[i].split(".",strRowAllSOCMED)
+			 
+				sosmedlist.Join(aa,"")
+
+				'cek jika ini adalah twitter
+				if strRowAllSOCMED[0] = "[F]" then
+				
+				strRowAllSOCMED[1] = ""
+				strRowAllSOCMED[2] = ""
+				
+				end if
+				
+				if strRowAllSOCMED[1] = "" and strRowAllSOCMED[2] = "" then
+				
+				aa.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " "  )
+				else
+				
+				aa.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " "  )
+				
+				end if
+			next
+			
+			scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =   sosmedlist
+			'scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =   sosmedlist
+			
+			
+			
+
+
+
+end sub
+
+sub bacaDataAwal2()
+
+for i = 0 to arrRowAllSOCMED.ubound
+				
+				arrRowAllSOCMED[i].split(".",strRowAllSOCMED)
+			 
+				sosmedlist.Join(aa,"")
+
+				'cek jika ini adalah twitter
+				if strRowAllSOCMED[0] = "[F]" then
+				
+				strRowAllSOCMED[1] = ""
+				strRowAllSOCMED[2] = ""
+				
+				end if
+				
+				if strRowAllSOCMED[1] = "" and strRowAllSOCMED[2] = "" then
+				
+				aa.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " "  )
+				else
+				
+				aa.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " "  )
+				
+				end if
+			next
+			
+			'scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =   sosmedlist
+			scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =   sosmedlist
+			
+			
+			
+
+
+
+end sub
+'baca data sosmed
+sub bacaData()
+aa.clear
+aa.push(" ")
+bb.clear
+bb.push(" ")
+	dim i as integer
+
+		'tentukan lokasi file text
+		fileAllSOCMED = GetParameterString("_windowspath") & GetParameterString("AllSOCMED")
+
+		'ambil isi file text
+		System.LoadTextFile(fileAllSOCMED, strDataAllSOCMED)
+
+		strDataAllSOCMED.split(Chr(10), arrRowAllSOCMED)
+
+
+end sub
+'untuk isi text ke 2
+sub GetAllSOCMED()
+
+
+				bacadata()
+				'ini array baru
+				println "array twitter " & sosmedlist
+				for i = 0 to arrRowAllSOCMED.ubound
+								
+				arrRowAllSOCMED[i].split(".",strRowAllSOCMED)
+				sosmedlist1.Join(bb,"")
+				'cek jika ini adalah FB
+				
+				if strRowAllSOCMED[0] = "[T]" then
+				strRowAllSOCMED[1]  = ""
+				strRowAllSOCMED[2] = ""
+				end if
+				
+				bb.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " " )
+				
+				next
+				
+				'ini array baru
+				println "array FB " & sosmedlist1
+				
+				if sosmedlist1.length < 20 then
+				
+				println "FB KOSONG "
+				
+				status = false
+				
+				scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =   sosmedlist
+				'scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =   sosmedlist
+				
+				else
+				println "FB ISI1"
+'				scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =   sosmedlist
+'				scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =   sosmedlist
+				scene.findcontainer("KOMENTAR_FACEBOOK").Geometry.text =   sosmedlist1 
+				
+				'TAMBAHAN SCRIPT
+				scene.findcontainer("KOMENTAR_FACEBOOK2").Geometry.text =   sosmedlist1 
+				
+				status = true
+				'scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =  sosmedlist
+				
+				end if
+				
+	
+end sub
+'untuk isi text ke 2
+sub GetAllSOCMED2()
+
+				bacadata()
+				
+				'ini array baru
+				println "array twitter " & sosmedlist
+				for i = 0 to arrRowAllSOCMED.ubound
+								
+				arrRowAllSOCMED[i].split(".",strRowAllSOCMED)
+				sosmedlist1.Join(bb,"")
+				'cek jika ini adalah twitter
+				
+				if strRowAllSOCMED[0] = "[T]" then
+				
+				strRowAllSOCMED[1]  = ""
+				strRowAllSOCMED[2] = ""
+				
+				end if
+				
+				bb.push(strRowAllSOCMED[1] & strRowAllSOCMED[2] & " " )
+
+				next
+				
+				'ini array baru
+				println "array FB " & sosmedlist1
+				
+				if sosmedlist1.length < 20 then
+				
+				println "FB KOSONG"
+				status = false
+				
+				scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =  sosmedlist
+				
+				else
+				println "FB ISI2"
+				
+				status = true
+				
+				scene.findcontainer("KOMENTAR_FACEBOOK").Geometry.text =   sosmedlist1 
+
+				end if
+				
+	
+end sub
+
+						
+sub jalan()
+
+komentar2 = true
+komentar2 = false
+
+komentar1 = false
+komentar1 = true
+
+end sub
+
+
+
+sub reset()
+
+bacaDataAwal1()
+
+bacaDataAwal2()
+
+	scene.findcontainer("KOMENTAR_TWITTER").Position.x = 262
+	scene.findcontainer("KOMENTAR_TWITTER2").Position.x = 262
+	scene.findcontainer("KOMENTAR_FACEBOOK").Position.x = 262
+	komentar2 = false
+	komentar3 = false
+
+	komentar1 = false
+
+end sub
+
+sub OnExecPerField()
+ 													 
+					tandaAkhir1 = scene.findContainer("akhir_komentar1") 
+					tandaAkhir2 = scene.findContainer("akhir_komentar2")
+					tandaAkhir3 = scene.findContainer("akhir_komentarfb1") 
+
+					if tandaAkhir1.position.x < 262 then 
+						
+						komentar2 = true
+						b = 0
+						'GetAllSOCMED()
+						end if
+					if tandaAkhir1.position.x < -262 then 
+						komentar1 = false
+						'TAMBAHAN SCRIPT
+						'GetAllSOCMED()
+						scene.findcontainer("KOMENTAR_TWITTER").Position.x = 262	
+					end if
+					if tandaAkhir2.position.x < 262 then 
+						komentar1 = true
+						
+						b = 0
+						'GetAllSOCMED()
+					end if
+					if tandaAkhir2.position.x < -262 then
+					println "tanda2 lewat"
+					'GetAllSOCMED2()
+						komentar2 = false
+						scene.findcontainer("KOMENTAR_TWITTER2").Position.x = 262
+						komentar1 = true
+						
+					end if
+					
+					'end if
+					if tandaAkhir3.position.x < -262 then 
+					
+					'GetAllSOCMED()
+					GetAllSOCMED2()
+
+						SendCommand("RENDERER*STAGE*DIRECTOR*SOSMED CONTINUE")
+						SendCommand("RENDERER*STAGE*DIRECTOR*SOCMED_FACEBOOK CONTINUE REVERSE")
+
+						komentar3 = false
+						
+					end if
+					
+				if status then
+					
+					if tandaAkhir1.position.x <= -261   then 
+						'b = 0
+						GetAllSOCMED2()
+						
+						'TAMBAHAN SCRIPT
+						'GetAllSOCMED()
+						println sosmedlist1
+						scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =  ""
+
+						println " status FB isi"
+						
+						end if
+						
+					if tandaAkhir2.position.x <= -261   then 
+						'b = 0
+						GetAllSOCMED()
+						SendCommand("RENDERER*STAGE*DIRECTOR*SOCMED_FACEBOOK CONTINUE REVERSE")
+						'SendCommand("RENDERER*STAGE*DIRECTOR*SOCMED_FACEBOOK SHOW 0")
+						SendCommand("RENDERER*STAGE*DIRECTOR*SOSMED CONTINUE")
+						
+						'animasi komentar twitter1 dan 2 di pause dikembaliin keposisi awal
+						
+						komentar1 = false
+						komentar2 = false
+						
+						
+						'jalanin animasi runing text komentar facebook
+						
+						komentar3 = true
+						
+					end if
+					
+				else
+				
+				
+					if tandaAkhir1.position.x <= -261   then 
+						'bacaDataAwal1()
+						
+						'kosongin text1
+						'GetAllSOCMED()
+						komentar1 = false
+						'TAMBAHAN SCRIPT
+						GetAllSOCMED()
+						
+						scene.findcontainer("KOMENTAR_TWITTER").Position.x = 262	
+						
+						scene.findcontainer("KOMENTAR_TWITTER").Geometry.text =  ""
+						'bacaData()
+						bacaData()
+						bacaDataAwal1()
+						
+						println " status FB isi false"
+						
+						
+					end if
+						
+					if tandaAkhir2.position.x <= -261   then 
+						'b = 0
+						GetAllSOCMED2()
+						'reset
+						komentar2 = false
+						scene.findcontainer("KOMENTAR_TWITTER2").Position.x = 262	
+						scene.findcontainer("KOMENTAR_TWITTER2").Geometry.text =  ""
+						bacaData()
+						bacaDataAwal2()
+						'GetAllSOCMED()
+						
+					end if
+					
+				end if
+'	
+	
+
+	
+	if komentar1 then
+		
+		scene.findcontainer("KOMENTAR_TWITTER").Position.x = scene.findcontainer("KOMENTAR_TWITTER").Position.x - 2
+		 
+	end if 
+	if komentar2 then
+		
+		scene.findcontainer("KOMENTAR_TWITTER2").Position.x = scene.findcontainer("KOMENTAR_TWITTER2").Position.x - 2
+		 
+	end if 
+	
+	if komentar3 then
+		
+		scene.findcontainer("KOMENTAR_FACEBOOK").Position.x = scene.findcontainer("KOMENTAR_FACEBOOK").Position.x - 2
+		 
+	end if
+	
+	
+end sub 
+
+

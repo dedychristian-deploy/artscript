@@ -1,0 +1,71 @@
+dim acak1_1, acak2_1, acak2_2 as integer
+dim simpannilaiacak1_1, jmlfile as Array[String]
+
+sub loadgambar_1Pemenang()
+	jmlfile = System.GetDirectoryContent(GetParameterString("pathFolder"), "*.jpg" ) 
+	acak1_1 = random(Cint(jmlfile.ubound-1))
+	SendCommand("RENDERER*TREE*$gambarku1_1*FUNCTION*ControlImage*input SET " & GetParameterString("pathFolder") & acak1_1 & ".JPG")
+end sub 
+
+sub loadgambar_2Pemenang()
+	jmlfile = System.GetDirectoryContent(GetParameterString("pathFolder"), "*.jpg" ) 
+	acak2_1 = random(Cint(jmlfile.ubound-1))
+	acak2_2 = random(Cint(jmlfile.ubound-1))
+	SendCommand("RENDERER*TREE*$gambarku2_1*FUNCTION*ControlImage*input SET " & GetParameterString("pathFolder") & acak2_1 & ".JPG")
+	SendCommand("RENDERER*TREE*$gambarku2_2*FUNCTION*ControlImage*input SET " & GetParameterString("pathFolder") & acak2_2 & ".JPG")
+end sub 
+
+sub start_stop_1Pemenang(nilai as string)
+	SendCommand("RENDERER*TREE*$gambarku1_1*FUNCTION*DataTimer*enabled SET " & nilai)
+end sub
+
+sub start_stop_2Pemenang(nilai as string)
+	SendCommand("RENDERER*TREE*$gambarku2_1*FUNCTION*DataTimer*enabled SET " & nilai)
+end sub
+
+sub OnInitParameters()
+	RegisterParameterString("pathFolder", "Path Folder", "E:\\Gambar\\MARGATH\\", 50, 256, "")
+end sub
+
+
+
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE start_stop_1Pemenang 0;
+
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE OnLButtonDown;
+
+
+
+
+
+RENDERER*TREE*$1_Pemenang*ACTIVE SET TRUE;
+RENDERER*TREE*$2_Pemenang*ACTIVE SET FALSE;
+RENDERER*STAGE*DIRECTOR*Countdown_2Pemenang SHOW 0;
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE start_stop_2Pemenang 0;
+
+
+
+
+
+
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE start_stop_1Pemenang 1;
+
+
+
+
+
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE start_stop_1Pemenang 1;
+
+
+RENDERER*TREE*$textku*SCRIPT INVOKE start_stop_1Pemenang 1;
+
+
+RENDERER*STAGE*DIRECTOR*ACAK SHOW 0;
+RENDERER*STAGE*DIRECTOR*ACAK CONTINUE;
+
+RENDERER*STAGE*DIRECTOR*ACAK SHOW 0;
+
+
+
+
+
+RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE start_stop_1Pemenang 0;

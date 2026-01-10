@@ -1,0 +1,25 @@
+
+sub Update()
+	Dim input,path,tot as string
+	Dim Lineas as Array[string]
+	Dim Cont as Container
+	path = "//172.17.2.251/data_pilkada_dki/txt/dki-all.txt"
+	System.LoadTextFile(path,input)
+	input.split(":",Lineas)
+    Sendcommand ("RENDERER*FUNCTION*DataPool*Data SET foke=" & Lineas[0] &"%")
+    Sendcommand ("RENDERER*FUNCTION*DataPool*Data SET jokow=" & Lineas[1] &"%")
+    Sendcommand ("RENDERER*FUNCTION*DataPool*Data SET totals=" & Lineas[2] &"%")
+
+    'Cont = this.FindSubContainer("foke_sementara")
+    'Cont.Geometry.Text = Lineas[0] & "%"
+
+    'Cont = this.FindSubContainer("jokow_sementara")
+    'Cont.Geometry.Text = Lineas[1] & "%"
+
+    'Cont = this.FindSubContainer("total_sementara")
+    'Cont.Geometry.Text = Lineas[2] & "%"
+end sub
+
+
+
+sendCommand("RENDERER*TREE*$Reader_Currency*FUNCTION*DataReader*load INVOKE")

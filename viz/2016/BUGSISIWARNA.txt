@@ -1,0 +1,299 @@
+
+'
+'sub OnLButtonDown()
+'end sub
+'
+'sub OnLButtonUp()
+'	SendCommand("RENDERER*FRONT_LAYER*STAGE*DIRECTOR*IKLAN-CG CONTINUE")
+'	SendCommand("RENDERER*MAIN_LAYER*STAGE*DIRECTOR*IKLAN-CG CONTINUE")
+'end sub
+
+
+dim toggle as boolean 
+dim delay as boolean
+dim inc as integer
+
+sub OnInitParameters()
+	RegisterParameterContainer("_controledParentLiveCont", "Parent Live Control Container")
+	RegisterParameterString( "_directorToRun","Director To Play", "PROGRAM", 40, 100, "" )
+	RegisterParameterInt( "_delay","Delay on Change", 20 , 0 , 1000)
+end sub
+
+sub OnLButtonDown()
+end sub
+
+sub OnLButtonUp() 
+	if not(toggle) then
+	
+		System.map["NAMA_PROGRAM"] = Scene.FindContainer("TEKS_PROGRAM").Geometry.Text
+		GantiBackgroundProgram()
+	
+		toggle = true		 	
+		
+		SendCommand("RENDERER*FRONT_LAYER*FUNCTION*DataPool*Data SET BUGS_JUDUL_PROGRAM = 1") 
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BUGS_JUDUL_PROGRAM = 1")
+		
+		scene.findcontainer("$BUNDEL_LOGO$LOGO_PROGRAM").active = toggle	
+		stage.finddirector( GetparameterString("_directorToRun") ).reverse = false
+		stage.finddirector( GetparameterString("_directorToRun") ).ContinueAnimation()
+		stage.finddirector("INOUT-BUGS-GLOBE") .reverse = false
+		stage.finddirector("INOUT-BUGS-GLOBE") .ContinueAnimation()
+		
+		GetParameterContainer("_controledParentLiveCont").script.setprogram_onair(toggle)
+		this.childcontainer.material.color.rgb = cvertex(255,0,0)/255
+	else
+		toggle = false		
+		SendCommand("RENDERER*FRONT_LAYER*FUNCTION*DataPool*Data SET BUGS_JUDUL_PROGRAM = 0") 
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BUGS_JUDUL_PROGRAM = 0")
+		stage.finddirector( GetparameterString("_directorToRun") ).reverse = true
+		stage.finddirector( GetparameterString("_directorToRun") ).ContinueAnimation()
+		stage.finddirector("INOUT-BUGS-GLOBE").reverse = true
+		stage.finddirector("INOUT-BUGS-GLOBE").ContinueAnimation()
+		GetParameterContainer("_controledParentLiveCont").script.setprogram_onair(toggle)		
+		delay = true
+	end if
+	
+end sub
+
+sub OnInit()
+	delay = false
+	toggle = false
+	inc = 0
+	stage.finddirector( GetParameterString("_directorToRun") ).time = 0
+	stage.finddirector( GetParameterString("_directorToRun") ).reverse = false
+	this.childcontainer.material.color.rgb = cvertex(0,0,0)/255
+	scene.findcontainer("$BUNDEL_LOGO$LOGO_PROGRAM").active = false
+	GetParameterContainer("_controledParentLiveCont").script.setprogram_onair(toggle)	
+end sub
+
+sub OnExecPerField()
+	if delay then
+		inc++
+		if inc >= GetparameterInt( "_delay" ) then
+			scene.findcontainer("$BUNDEL_LOGO$LOGO_PROGRAM").active = toggle	
+			this.childcontainer.material.color.rgb = cvertex(0,0,0)/255
+			inc = 0
+			delay = false
+			'println is_onairFrom
+			'if il_onair and this.name <> is_onairFrom then
+			'	OnLButtonUp()
+			'end if	
+		end if
+		
+	end if
+end sub
+
+Sub GantiBackgroundProgram()
+	dim namaProgram as string
+	dim namaBackground as string
+	dim namaBarKiri as string
+	dim namaLogo as string
+	dim ArrayProgram as array[String]
+	
+	dim ArrayBarKiri as array[String]
+	dim ArrayLogo as array[String]
+	
+	dim i as integer
+	
+'	namaProgram = Scene.FindContainer("PROGRAM_JUDUL").Geometry.Text
+	namaProgram = Scene.FindContainer("TEKS_PROGRAM").Geometry.Text
+	namaProgram.MakeUpper()
+	'BULETIN
+	if namaProgram = "METRO PAGI" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metropagi")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_PAGI;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_PUTIH;")
+	'METRO FAJAR
+	elseif namaProgram = "METRO FAJAR" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrofajar")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_FAJAR;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO KINI
+	elseif namaProgram = "METRO KINI" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrokini")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_KINI;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO JELANG SIANG
+	elseif namaProgram = "METRO JELANG SIANG" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrojelangsiang")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_JELANG_SIANG;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO SIANG
+	elseif namaProgram = "METRO SIANG" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrosiang")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SIANG;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+	'METRO SORE
+	elseif namaProgram = "METRO SORE" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrosore")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_SORE;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO HARI INI
+	elseif namaProgram = "METRO HARI INI" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrohariini")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_HARI_INI;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+	'TOP NEWS
+	elseif namaProgram = "TOP NEWS" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE topnews")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TOP_NEWS;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO MALAM
+	elseif namaProgram = "METRO MALAM" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metromalam")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/METRO_MALAM;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+	'PRIMETIME NEWS
+	elseif namaProgram = "PRIMETIME NEWS" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE primetimenews")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_ORANGETUA;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'HEADLINE NEWS
+	elseif namaProgram = "HEADLINE NEWS" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE headlinenews")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_ORANGETUA;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'METRO HIGHLIGHT
+	elseif namaProgram = "METRO HIGHLIGHT" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrohighlight")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_KUNING;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+
+	'METRO THIS WEEK
+	elseif namaProgram = "METRO THIS WEEK" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE metrothisweek")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	elseif namaProgram = "WORLD NEWS" then
+		
+	elseif namaProgram = "METRO XIN WEN" or namaProgram = "XIN WEN" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE xinwen")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_MERAH;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+	
+	'elseif namaProgram = "METRO BISNIS" then
+		
+	'BREAKING NEWS		
+	elseif namaProgram = "BREAKING NEWS" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE breaking")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")		
+		
+	elseif namaProgram = "WIDE SHOT" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE wideshot")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_ORANGETUA;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+		
+		'println "wideshot"
+		
+	'elseif namaProgram = "METRO SPORT" then
+		
+		
+'	elseif namaProgram = "FORUM INDONESIA" then
+'		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE forindo")
+'		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_HITAM;")
+'		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_PUTIH;")
+		
+'	elseif namaProgram = "MATA NAJWA" then
+'		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE matanajwa")
+'		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_HITAM;")
+'		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_PUTIH;")
+'		
+	'TT
+	elseif namaProgram = "TRENDING TOPIC" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE trendingtopic")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_BIRU_1;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+	'TTW
+	elseif namaProgram = "TRENDING TOPIC" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE ttw")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_UNGU;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+			
+	elseif namaProgram = "ECONOMIC CHALLENGES" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE ec")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_ORANGEMUDA;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+		
+	'elseif namaProgram = "BINCANG PAGI" then
+		
+	'811	
+	elseif namaProgram = "811" then
+		SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE delapansebelas")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/BAR_CG_ORANGETUA;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+								
+	else
+		'SendCommand("RENDERER*MAIN_LAYER*TREE*$MULTIMEDIA_SCRIPT*SCRIPT INVOKE delapansebelas")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_HITAM;")
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET TEKS_PROGRAM = MATERIAL MATERIAL*00-BANK-MATERIAL/CG_2016/TEXT_PUTIH;")
+		
+	end if	
+		
+	ArrayProgram.push("METRO_FAJAR")
+	ArrayProgram.push("METRO_PAGI")
+	ArrayProgram.push("METRO_KINI")
+	ArrayProgram.push("METRO_JELANG_SIANG")
+	ArrayProgram.push("METRO_PAGI")
+	ArrayProgram.push("METRO_XIN_WEN")
+	ArrayProgram.push("METRO_SIANG")
+	ArrayProgram.push("METRO_SORE")
+	ArrayProgram.push("METRO_HARI_INI")
+	ArrayProgram.push("METRO_MALAM")
+	ArrayProgram.push("HEADLINE_NEWS")
+	ArrayProgram.push("BREAKING_NEWS")
+	ArrayProgram.push("NETRAL")
+	ArrayProgram.push("BIRU_TUA")
+	ArrayProgram.push("BIRU_MUDA")
+	ArrayProgram.push("KIRI-NETRAL")
+	ArrayProgram.push("KIRI-WIDESHOT")
+	ArrayProgram.push("KIRI-SPORT")
+	ArrayProgram.push("KIRI-BREAKING")
+	ArrayProgram.push("GLOBE-LOGO")
+	ArrayProgram.push("WIDESHOT-LOGO")
+	ArrayProgram.push("METRO-SPORT-LOGO")
+	ArrayProgram.push("MATA_NAJWA")
+	ArrayProgram.push("FORUM_INDONESIA")
+	ArrayProgram.push("TRENDING_TOPIC")
+	ArrayProgram.push("TRENDING_TOPIC_WEEKEND")
+	ArrayProgram.push("KUPAS_KETUJUH")
+	ArrayProgram.push("ECONOMIC_CHALLENGES")
+	ArrayProgram.push("BINCANG_PAGI")
+	ArrayProgram.push("811")
+
+	
+
+	'lakukan looping untuk mengcek masing-masing nama program
+	for i = ArrayProgram.LBound to ArrayProgram.UBound
+		'jika nama program ada disalah satu pilihan array maka nyalakan container tersebut
+		if ArrayProgram[i] = namaBackground then
+			Scene.FindContainer(ArrayProgram[i]).Active = True
+			
+			elseif ArrayProgram[i] = namaLogo then
+			Scene.FindContainer(ArrayProgram[i]).Active = True
+			
+			elseif ArrayProgram[i] = namaBarKiri then
+			
+			Scene.FindContainer(ArrayProgram[i]).Active = True
+			'Scene.FindContainer(ArrayProgram[i]).LastChildContainer.active= false
+			
+		else
+			Scene.FindContainer(ArrayProgram[i]).Active = False		
+		end if
+	next
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

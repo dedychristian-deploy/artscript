@@ -1,0 +1,165 @@
+dim lc_cont as container
+dim lc_cont2 as container
+dim lc_lapangan as container
+dim drag_active as boolean=false
+dim kec_ld, batas_ld, jml_qc_image as integer	
+
+dim strCmd as string
+dim detail,usia as string
+dim arrstrisibaris,arrstrisibaris2 as Array [String]
+
+lc_lapangan = Scene.FindContainer("OVERLAY-LAPANGAN")
+dim head_dir = stage.FindDirector("IN_OUT_HEAD_1")
+
+
+
+sub act(act as boolean)
+	drag_active=act
+end sub
+sub OnLButtonDown()
+
+	'jika ada nama cadangan yang akan menggantikan pemain utama
+	if Scene.Map["cadangan"] <> "" then
+		lc_cont = this.ChildContainer
+		
+		'tempatkan nama pemain di container cadangan terpilih
+		Scene.FindContainer(Scene.Map["tukar"]).Geometry.Text = this.childcontainer.geometry.text
+		Scene.FindContainer(Scene.Map["tukar2"]).Geometry.Text = this.childcontainer.nextcontainer.geometry.text
+		Scene.FindContainer(Scene.Map["tukar3"]).Geometry.Text = this.childcontainer.nextcontainer.nextcontainer.geometry.text
+		'semua data profil
+		
+		'isi container pemain dengan nama cadangan
+		this.childcontainer.geometry.text = Scene.Map["cadangan"]
+		this.childcontainer.nextcontainer.geometry.text = Scene.Map["cadangan2"]
+		this.childcontainer.nextcontainer.nextcontainer.geometry.text = Scene.Map["cadangan3"]
+		'kosongkan variabel cadangan
+		Scene.Map["cadangan"] = ""
+		Scene.Map["cadangan2"] = ""
+		Scene.Map["cadangan3"] = ""
+		
+		println "isi geometri ==> " & this.childcontainer.nextcontainer.geometry.text
+	end if
+	
+	if 	System.Map["Menu"] = "head" then
+	
+		drag_active=false
+		'script untuk lihat profil pemain
+		detail = this.childcontainer.nextcontainer.nextcontainer.geometry.text
+		detail.split(";", arrstrisibaris) 
+		
+		println arrstrisibaris[0]
+		
+	'kolom nomor
+	scene.findcontainer("$HEAD-TO-HEAD_1$NOMOR-PUNGGUNG").Geometry.Text	 = arrstrisibaris[0]
+	'kolom nama
+	scene.findcontainer("$HEAD-TO-HEAD_1$NAMA-PEMAIN").Geometry.Text	 = arrstrisibaris[1]
+	'kolom jumlah posisi
+	scene.findcontainer("$HEAD-TO-HEAD_1$POSISI").Geometry.Text	 = arrstrisibaris[3]
+	'kolom jumlah usia
+	arrstrisibaris[4].split("(", arrstrisibaris2) 
+	
+	scene.findcontainer("$HEAD-TO-HEAD_1$USIA").Geometry.Text	 = "(" & arrstrisibaris2[1]
+	'kolom jumlah cap
+	scene.findcontainer("$HEAD-TO-HEAD_1$CAP").Geometry.Text	 = arrstrisibaris[5]
+	'kolom jumlah goal
+	scene.findcontainer("$HEAD-TO-HEAD_1$GOAL").Geometry.Text	 = arrstrisibaris[6]
+
+	
+'	 '#36105*FUNCTION*ControlImage*image_prefix SET sd
+		'image path
+		strCmd = "RENDERER*TREE*$HEAD-TO-HEAD_1$PROFIL-HEAD-TO-HEAD$TEMP_REG$FOTO-PROFIL$FOTO_HEAD*FUNCTION*ControlImage*input SET " & arrstrisibaris[8]
+		sendCommand(strCmd)
+		
+		head_dir.reverse = false
+		head_dir.time = 0.0
+		head_dir.Continueanimation()
+
+	else
+		drag_active=true
+	end if
+
+end sub
+
+sub OnLButtonUp()
+
+end sub
+
+sub OnEnter()
+
+'this.childcontainer.nextcontainer.nextcontainer.active = true	
+'sendCommand ("RENDERER*TREE*$HIT_TRANSITION_TEAM1_1*ACTIVE SET TRUE")
+end sub 
+
+sub OnLeave()
+this.childcontainer.nextcontainer.nextcontainer.active = false	
+'sendCommand ("RENDERER*TREE*$HIT_TRANSITION_TEAM1_1*ACTIVE SET FALSE")
+end sub
+
+sub OnButtonDown6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	if this.containsmousecursor() then
+		drag_active=true
+	end if
+end sub
+
+sub OnButtonUp6DOF(button As Integer, pos As Vertex, rot As Vertex)
+    drag_active=false
+end sub
+
+sub OnMoveRelative6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	dim lx,ly,lz as double
+	
+	lx = pos[0]
+	ly = pos[1]
+	lz = 0.0
+	
+'	if drag_active=true then
+'	    this.position.xyz+= cvertex(lx,0,0)
+'		'println "x" & this.position.x
+'		
+'		if (this.position.x <-209 ) then
+'			println "out your x" & this.position.x
+'		else  
+'			println "in your x" & this.position.x
+'		end if
+'	end if
+
+if drag_active = true  then
+			this.position.xyz += cvertex(lx,ly,0)
+			'this.position.x += cvertex(lx,0,0)
+			
+			if this.position.y > 138 then
+				this.position.y = 136
+				drag_active=false
+				println "out your y" & this.position.y
+			elseif this.position.y < -116 then
+				this.position.y = -114
+				drag_active=false
+				println "out your y" & this.position.y
+			elseif this.position.x < -224 then
+				this.position.x = -223
+				drag_active=false
+				println "out your x" & this.position.x
+			elseif this.position.x > 225 then
+				this.position.x = 223
+				drag_active=false
+				println "out your x" & this.position.x
+			else 
+				println "you're in a field"
+			end if
+			
+			
+
+		end if
+end sub
+
+
+
+sub OnInit()
+	kec_ld = 10
+	'position.x = 0
+end sub
+
+
+
+
+

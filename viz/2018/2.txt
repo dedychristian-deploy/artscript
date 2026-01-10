@@ -1,0 +1,104 @@
+dim lc_cont as container
+dim lc_cont2 as container
+dim lc_lapangan as container
+dim drag_active as boolean=false
+dim kec_ld, batas_ld, jml_qc_image as integer	
+dim cmd as string
+
+lc_lapangan = Scene.FindContainer("noname1")
+'
+'
+'
+sub OnLButtonDown()
+	drag_active=true
+	SendRemoteCommand("192.168.124.68", 6100, "RENDERER*TREE*$"&this.name&"$Run*ACTIVE SET TRUE", 100)
+	SendRemoteCommand("192.168.124.68", 6100, "RENDERER*TREE*$"&this.name&"$Idle*ACTIVE SET FALSE", 100) 
+	
+	println this.nextcontainer.name
+end sub
+
+sub OnButtonDown6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	'if this.containsmousecursor() then
+
+	'end if
+end sub
+
+sub OnButtonUp6DOF(button As Integer, pos As Vertex, rot As Vertex)
+    drag_active=false
+	SendRemoteCommand("192.168.124.68", 6100, "RENDERER*TREE*$"&this.name&"$Idle*ACTIVE SET TRUE", 100) 
+	SendRemoteCommand("192.168.124.68", 6100, "RENDERER*TREE*$"&this.name&"$Run*ACTIVE SET FALSE", 100)
+	
+	
+end sub
+
+sub OnMoveRelative6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	dim lx,ly,lz as double
+	
+	lx = pos[0]
+	ly = pos[1]
+	lz = 0.0
+			
+if drag_active = true  then
+			this.position.xyz += cvertex(lx,ly,0)
+			'sendCommand("RENDERER*TREE*$Player-Kiper*SCRIPT INVOKE asd")
+			println System.Map["Server"]
+			SendRemoteCommand("192.168.124.68", 6100, "RENDERER*TREE*$"&this.name&"$Master*SCRIPT INVOKE ubahDOF "& lx & " " & ly, 1)
+			'ubahDOF(lx,ly)
+			'lc_lapangan.position.xyz += cvertex(lx,ly,0)
+			
+			'cmd = "RENDERER*TREE*$" & this.name & "*TRANSFORMATION*POSITION*X SET " & this.position.x
+			'SendRemoteCommand("192.168.124.22", 6100, cmd_ls, 0) 
+			
+			'cmd = "RENDERER*TREE*$" & this.name & "*TRANSFORMATION*POSITION*Y SET " & this.position.y
+			'SendRemoteCommand("192.168.124.22", 6100, cmd_ls, 0) 
+			
+			'this.position.x += cvertex(lx,0,0)
+			
+'			if this.position.y > 138 then
+'				this.position.y = 136
+'				drag_active=false
+'				println "out your y" & this.position.y
+'			elseif this.position.y < -116 then
+'				this.position.y = -114
+'				drag_active=false
+'				println "out your y" & this.position.y
+'			elseif this.position.x < -224 then
+'				this.position.x = -223
+'				drag_active=false
+'				println "out your x" & this.position.x
+'			elseif this.position.x > 225 then
+'				this.position.x = 223
+'				drag_active=false
+'				println "out your x" & this.position.x
+'			else 
+				'println "you're in a field" & pos
+'			end if
+		end if
+end sub
+
+sub ubahDOF(a As double,b As double)
+'	dim lx,ly,lz as double
+'	
+'	lx = a
+'	ly = b
+'	lz = 0.0
+'
+'			
+'if drag_active = true  then
+'			this.position.xyz += cvertex(lx,ly,0)
+'			sendCommand("RENDERER*TREE*$Player-Kiper*SCRIPT INVOKE asd")
+'		end if
+end sub
+
+
+
+sub OnInit()
+	kec_ld = 10
+	'position.x = 0
+end sub
+
+
+
+
+
+

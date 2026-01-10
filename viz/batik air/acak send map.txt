@@ -1,0 +1,94 @@
+dim send, cmd_map as string
+'dim satuan_1, satuan_2, satuan_3, satuan_4, satuan_5, satuan_6, satuan_7, satuan_8, satuan_9, satuan_10, satuan_11, satuan_12 as string
+dim i, x, nilai as integer
+
+sub OnExecPerField()
+
+		x = CInt(GetParameterBool("acak_telp"))
+	if 	x = 1 then
+	
+		for i = 1 to 13
+			send = "RENDERER*BACK_LAYER*TREE*$ACAK"&i&"*GEOM*TEXT SET " & Random(9) 
+			SendCommand(send)
+		next
+	elseif x = 0 then
+	
+	'	send = "RENDERER*TREE*$PUSHBUTTON*AUDIO*TEST_CLIP PLAY"
+	'	SendCommand(send)
+		
+end if
+	
+end sub
+
+sub reset()
+	for i = 1 to 13
+		Scene.FindContainer("ACAK"&i).Geometry.Text = "0"
+	next
+end sub
+
+sub OnInitParameters()
+
+	RegisterParameterBool("acak_telp", "ACAK NOMOR", false)
+	RegisterParameterString("Server","Server","192.168.124.36",20,20,"")
+	RegisterParameterInt("Port","Port",6100,0,9999)
+		
+end sub
+
+sub OnInit()
+
+	System.Map["Server"] = GetParameterString("Server")
+	System.Map["Port"] = GetParameterInt("Port")
+	
+end sub
+
+sub tiket(tiket as string)
+
+	cmd_map = "RENDERER*TREE*$ACAKACAK*GEOM*TEXT SET " & tiket 
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"], cmd_map, 0)
+	
+	'RENDERER*TREE*$ACAKACAK*GEOM*TEXT SET 1256987452361
+	'RENDERER*TREE*$TELEPON*GEOM*TEXT SET 08124578XXX
+	send = "RENDERER*BACK_LAYER*TREE*$ACAKACAK*GEOM*TEXT SET " & tiket 
+	SendCommand(send)
+
+end sub
+
+sub telepon(telepon as string)
+
+	cmd_map = "RENDERER*TREE*$TELEPON*GEOM*TEXT SET " & telepon 
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"], cmd_map, 0)
+	
+	'RENDERER*TREE*$ACAKACAK*GEOM*TEXT SET 1256987452361
+	'RENDERER*TREE*$TELEPON*GEOM*TEXT SET 08124578XXX
+	send = "RENDERER*BACK_LAYER*TREE*$TELEPON*GEOM*TEXT SET " & telepon 
+	SendCommand(send)
+
+end sub
+
+
+sub OnLButtonDown()
+
+cmd_map = "RENDERER*STAGE*DIRECTOR*CG_ACAK CONTINUE"
+SendRemoteCommand(System.Map["Server"], System.Map["Port"], cmd_map, 0)
+
+
+println System.Map["Server"]
+end sub
+
+sub reset_acak()
+
+	SendCommand("RENDERER*BACK_LAYER*STAGE*DIRECTOR*CG_ACAK SHOW 0")
+	SendCommand("RENDERER*BACK_LAYER*TREE*$AUDIO_PEMENANG*AUDIO*TEST_CLIP STOP")
+	SendCommand("RENDERER*BACK_LAYER*TREE*$AUDIO_ACAK*AUDIO*TEST_CLIP STOP")
+	SendCommand("RENDERER*BACK_LAYER*TREE*$LETS_CODE*SCRIPT*INSTANCE*acak_telp SET 0")
+	SendCommand("RENDERER*BACK_LAYER*TREE*$LETS_CODE*SCRIPT INVOKE reset")
+	
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"],"RENDERER*STAGE*DIRECTOR*CG_ACAK SHOW 0", 0)
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"],"RENDERER*TREE*$AUDIO_PEMENANG*AUDIO*TEST_CLIP STOP", 0)
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"],"RENDERER*TREE*$AUDIO_ACAK*AUDIO*TEST_CLIP STOP", 0)
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"],"RENDERER*TREE*$LETS_CODE*SCRIPT*INSTANCE*acak_telp SET 0", 0)
+	SendRemoteCommand(System.Map["Server"], System.Map["Port"],"RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE reset", 0)
+	'RENDERER*BACK_LAYER*TREE*$LETS_CODE*SCRIPT INVOKE reset_acak
+	
+end sub
+

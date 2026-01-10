@@ -1,0 +1,107 @@
+DIM COUNTER AS INTEGER
+dim cmd as string
+dim status as boolean
+
+'status = false
+
+sub OnLButtonDown()
+
+
+end sub
+
+sub OnInitParameters()
+
+	
+	'RegisterParameterBool("Status","Status", False)
+	'Status = false
+	'paramater untuk CountDown
+	RegisterParameterInt("Detik","Detik",0,0,99)
+	RegisterParameterInt("PeringatanSatu_tm","Peringatan Satu",0,0,99)
+	RegisterParameterInt("PeringatanDua_tm","Peringatan Dua",0,0,99)
+	RegisterParameterInt("PeringatanTiga_tm","Peringatan Tiga",0,0,99)
+	'RegisterPushButton("Reset", "Reset", 0)
+end sub
+
+
+SUB NILAIAWAL()
+
+	'COUNTER = 10
+	COUNTER = GetParameterInt("Detik")
+	
+	'PERINGATAN1
+	'PERINGATAN2
+	'PERINGATAN3
+	Scene.FindContainer("nilai").Geometry.Text = Digit(cstr(COUNTER))
+	Scene.FindContainer("depan_atas").Geometry.Text =Digit(cstr(COUNTER))
+	Scene.FindContainer("belakang_atas").Geometry.Text =Digit(cstr(COUNTER -1 ))
+	'Scene.FindContainer("depan_bawah").Geometry.Text =cstr(COUNTER)
+	
+	
+END SUB
+
+SUB COUNTERKU()
+
+	COUNTER -= 1
+	println "COUNTER : " & COUNTER
+	Scene.FindContainer("nilai").Geometry.Text = Digit(cstr(COUNTER))
+	
+	Scene.FindContainer("depan_atas").Geometry.Text =Digit(cstr(COUNTER))
+	Scene.FindContainer("belakang_atas").Geometry.Text =Digit(cstr(COUNTER -1 ))
+
+	
+		if Scene.FindContainer("nilai").Geometry.Text = "00" then
+'			'tutup timer/berhenti/status 0
+			
+			SendCommand("RENDERER*STAGE*DIRECTOR*Counterku SHOW $stop")
+			COUNTER = 0
+			'println COUNTER 
+			Scene.FindContainer("nilai").Geometry.Text = Digit(cstr(COUNTER))
+			Scene.FindContainer("depan_atas").Geometry.Text =Digit(cstr(COUNTER))
+			Scene.FindContainer("belakang_atas").Geometry.Text =Digit(cstr(COUNTER ))
+
+	end if
+	
+	Peringatan()
+	
+	'end if
+	
+END SUB
+
+Sub Peringatan()
+
+	if Digit(CStr(GetParameterInt("PeringatanSatu_tm"))) = Scene.FindContainer("nilai").Geometry.Text then
+		cmd= "RENDERER*TREE*$PeringatanSatu*AUDIO*TEST_CLIP PLAY" 
+		SendCommand(cmd)
+		println"tttteeenggg1"
+	
+	elseif Digit(CStr(GetParameterInt("PeringatanDua_tm"))) = Scene.FindContainer("nilai").Geometry.Text then
+		cmd= "RENDERER*TREE*$PeringatanDua*AUDIO*TEST_CLIP PLAY" 
+		SendCommand(cmd)
+		println "dua"
+	
+	elseif Digit(CStr(GetParameterInt("PeringatanTiga_tm"))) >= Scene.FindContainer("nilai").Geometry.Text and Scene.FindContainer("nilai").Geometry.Text > "00" then
+		cmd= "RENDERER*TREE*$PeringatanTiga*AUDIO*TEST_CLIP PLAY" 
+		SendCommand(cmd)
+		println "tiga"
+		
+	elseif COUNTER = 0 and  Scene.FindContainer("nilai").Geometry.Text = "00" then
+		cmd= "RENDERER*TREE*$PeringatanAkhir*AUDIO*TEST_CLIP PLAY" 
+		SendCommand(cmd)
+		println "lima"
+	
+
+	
+	end if
+	
+	
+	
+End Sub
+
+Function Digit(timer as string) as string
+	if timer.length = 1 then
+		timer = "0" & timer
+	end if 
+	Digit = timer
+end function
+
+

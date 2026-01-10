@@ -1,0 +1,200 @@
+dim lokasifile, strlokasifile, cmd, nilainilai1,nilaichart3, nilainilai2,nilaichart4 as string
+dim arrstrlokasifile, arrstrisibaris,baris,barisoke,baris2,barisoke2,angka1,angka2,angka3,angka4,angka12,angka22,angka32,angka42 as Array[String] 
+dim totalbaris as integer
+dim tobar,tobar2,nilaitotal,ini1,ini2,ini3,chartini1,chartini2,chartini3,chartini4 as double
+dim nilai_tertinggi_bar1,nilai_tertinggi_bar2 as integer
+
+dim x as string
+sub OnInitParameters()
+	RegisterFileSelector("LokasiText", "LokasiText", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\TRENDING TOPIC\\5. komparasi_data", "tranding_topik_tokoh_1.txt", "*.txt")
+end sub
+
+sub Isi()
+
+	'ambil isi file text
+	lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	nilai_tertinggi_bar1 = 0
+	nilai_tertinggi_bar2 = 0
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	
+	for i = 0 to arrstrlokasifile.ubound + 1   
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+		CekNilai(arrstrisibaris[0], cint(arrstrisibaris[1]))
+		CekNilai2(arrstrisibaris[0], cint(arrstrisibaris[2]))
+		CekNilai3(arrstrisibaris[0], arrstrisibaris[1])
+				
+	next
+	
+	
+	barisoke.clear
+	barisoke2.clear
+	angka2.clear
+	angka4.clear
+	angka22.clear
+	angka42.clear
+end sub
+
+
+sub nilai_tertinggi_b1(nilai as integer)
+	if nilai > nilai_tertinggi_bar1 then
+		nilai_tertinggi_bar1 = nilai
+	end if	
+
+end sub
+
+sub nilai_tertinggi_b2(nilai as integer)
+	if nilai > nilai_tertinggi_bar2 then
+		nilai_tertinggi_bar2 = nilai
+	end if
+
+
+end sub
+
+Sub CekNilai(katakunci as string, nilai1 as integer)
+
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	'nilaitotal = cdbl(nilai_tertinggi_bar1)
+	baris.clear
+	angka1.clear
+	angka3.clear
+	
+	'println "ini >>>>" & Scene.FindContainer("nilai_tinggi").Geometry.Text
+	'Scene.FindContainer("nilai_tinggi").Geometry.Text = Cstr(tobar)	
+	angka1.push(Cstr(nilai_tertinggi_bar1))
+	
+	angka2.push(angka1[0])
+			
+			
+			
+			
+	
+   for i = 1 to 7
+        
+		if katakunci = "nilai"&i  then
+		
+			'cek nilai tertinggi
+			nilai_tertinggi_b1(nilai1)
+   			angka3.push(Cstr(nilai1))
+			angka4.push(angka3[0])
+
+		end if
+
+		ini1 = cdbl(angka4[(i-1)])/cdbl(angka2[7])*100
+		chartini1 = cdbl(angka4[(i-1)])/cdbl(nilai_tertinggi_bar1)*100
+		chartini3 = cdbl(angka4[(i-1)])/cdbl(ini3)*100
+		
+		sendCommand("RENDERER*TREE*$GRAPH1*GEOM*Y"&i&" SET "&cstr(chartini3))
+			
+			'BAR1
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR1-"&i&" = " & cdbl(chartini1))
+
+			'ANGKA1
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA1_"&i&" = " & cdbl(angka4[i-1]))
+		
+		println (cdbl(angka2[7]))
+	next
+	
+end sub
+
+Sub CekNilai2(katakunci as string, nilai1 as integer)
+
+'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	baris2.clear
+	angka12.clear
+	angka32.clear
+	
+			angka12.push(Cstr(nilai_tertinggi_bar2))
+			angka22.push(angka12[0])
+
+   for i = 1 to 7
+        
+		if katakunci = "nilai"&i  then
+		
+			'cek nilai tertinggi
+			nilai_tertinggi_b2(nilai1)
+
+			angka32.push(Cstr(nilai1))
+	
+			angka42.push(angka32[0])
+	
+
+		end if
+
+		ini2 = cdbl(angka42[(i-1)])/cdbl(angka22[7])*100
+		chartini2 = cdbl(angka42[(i-1)])/cdbl(nilai_tertinggi_bar2)*100
+		chartini4 = cdbl(angka42[(i-1)])/cdbl(ini3)*100
+
+		sendCommand("RENDERER*TREE*$GRAPH2*GEOM*Y"&i&" SET "&cstr(chartini4))
+			
+			'BAR1
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR2-"&i&" = " & cdbl(chartini2))
+
+			'ANGKA1
+		SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA2_"&i&" = " & cdbl(angka42[i-1]))
+	next
+	
+	'println (cdbl(ini2))
+
+end sub
+
+Sub CekNilai3(katakunci as string, nilai1 as string)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	'
+	'ket-3-kiri-1
+'	SUMBER-CHART-1
+	
+	
+	
+	if nilai_tertinggi_bar1 >= nilai_tertinggi_bar2 then
+	
+	ini3 = nilai_tertinggi_bar1
+	
+	elseif nilai_tertinggi_bar2 >= nilai_tertinggi_bar1 then
+	ini3 = nilai_tertinggi_bar2
+	end if
+	
+	scene.findcontainer("KET-3-KIRI-1").Geometry.text =  cstr(ini3)
+	scene.findcontainer("KET-3-KIRI-2").Geometry.text =  cstr(ini3/2)
+	
+	nilaichart3 = "0,"&(cdbl(angka4[(1-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(2-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(3-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(4-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(5-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(6-1)])/cdbl(ini3)*100)&","&(cdbl(angka4[(7-1)])/cdbl(ini3)*100)
+	scene.findcontainer("KATA").Geometry.text =  nilaichart3
+	sendCommand("RENDERER*TREE*$AREA1*FUNCTION*DataStorage*Data1 SET "& nilaichart3)
+	
+	nilaichart4 = "0,"&(cdbl(angka42[(1-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(2-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(3-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(4-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(5-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(6-1)])/cdbl(ini3)*100)&","&(cdbl(angka42[(7-1)])/cdbl(ini3)*100)
+	sendCommand("RENDERER*TREE*$AREA2*FUNCTION*DataStorage*Data1 SET "& nilaichart4)
+	'println nilaichart4
+	
+   for i = 1 to 7
+	if katakunci = "keterangan"&i  then
+	scene.findcontainer("KET1_"&i).Geometry.text =  nilai1
+	scene.findcontainer("KET2_"&i).Geometry.text =  nilai1
+	scene.findcontainer("KET3_"&i).Geometry.text =  nilai1
+	end if
+
+	next
+	
+	for i = 1 to 3
+	if katakunci = "sumber"  then
+	scene.findcontainer("SUMBER-CHART-"&i).Geometry.text =  nilai1
+'	scene.findcontainer("SUMBER-CHART-"&i).Geometry.text =  nilai1
+'	scene.findcontainer("SUMBER-CHART-"&i).Geometry.text =  nilai1
+	end if
+
+	next
+	
+	for i = 1 to 2
+	if katakunci = "legenda"&i  then
+	scene.findcontainer("JUDUL-CHART"&i).Geometry.text =  nilai1
+	scene.findcontainer("JUDUL-CHART2"&i).Geometry.text =  nilai1
+	scene.findcontainer("JUDUL-CHART3-"&i).Geometry.text =  nilai1
+	
+	
+	'scene.findcontainer("JUDUL-CHART3-"&i).Geometry.text =  nilai1
+	
+	end if
+	next
+end sub
+

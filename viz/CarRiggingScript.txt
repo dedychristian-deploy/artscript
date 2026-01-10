@@ -1,0 +1,103 @@
+Dim spd as double
+dim RotSpd as double
+dim steering as double
+dim count = 1
+sub OnInitParameters()
+
+	RegisterParameterDouble("sspeed", "Suspension Speed :" , 5 , 2 , 20)
+	RegisterParameterDouble("RotSpeed", "Tires Speed :" , 1 , 1 , 10)
+	RegisterParameterDouble("Steer", "Steering :" , 0 , -40 , 40)
+	
+	registerpushbutton("BTN_init","Build The Tree!",0)
+		
+	
+end sub
+
+sub OnExecPerField()
+	dim master =findsubcontainer("Master")
+	dim body =findsubcontainer("Body")
+	dim cctr =findsubcontainer("Control")
+	dim FrntLftTire =findsubcontainer("FrontLeftTire")
+	dim FrntRitTire =findsubcontainer("FrontRightTire")
+	dim RearTires =findsubcontainer("RearTires")
+	dim AllTires =findsubcontainer("Main Tires Container")
+	
+	spd = GetParameterDouble("sspeed")
+	RotSpd = GetParameterDouble("RotSpeed")
+	steering = GetParameterDouble("Steer")
+	FrntRitTire.rotation.z = FrntLftTire.rotation.z
+	RearTires.rotation.z = FrntLftTire.rotation.z
+	 
+	FrntRitTire.rotation.y = steering		
+	FrntLftTire.rotation.y = steering
+	
+	
+	if master.position.x < cctr.position.x then
+
+		cctr.position.x = cctr.position.x  - ((cctr.position.x - master.position.x)/spd)
+		body.rotation.z = (master.position.x - cctr .position.x)/spd
+		FrntLftTire.rotation.z = (master.position.x )*-RotSpd 
+			
+	
+			
+	elseif master.position.x > cctr.position.x then
+		cctr.position.x = cctr.position.x  + ((master.position.x - cctr.position.x)/spd)
+		body.rotation.z = (master.position.x - cctr.position.x)/spd
+		FrntLftTire.rotation.z = (master.position.x )*-RotSpd
+		
+		 
+	end if 
+		
+
+	AllTires.position.y = master.position.y *-1
+	if master.position.y > 0 then
+	
+		if master.position.y > spd then
+			AllTires.position.y = spd * -1
+		end if
+	end if
+	
+		if master.position.y < 0 then
+	
+			if master.position.y < spd *-2 then
+				AllTires.position.y = spd *2
+			end if
+	end if
+	
+end sub
+sub BuildTree()
+if count = 1 then
+	dim CarMain = this.name="Car_Main"
+	dim Control = this.addContainer(TL_DOWN)
+		Control.name = "Control"
+	dim Master = Control.addContainer(TL_NEXT)
+		Master.name = "Master"
+	dim Tires = Master.addContainer(TL_DOWN)
+		Tires.name = "Tires"
+	dim Body = Master.addContainer(TL_DOWN)
+		Body.name = "Body"
+	dim RearTires = Tires.addContainer(TL_DOWN)
+		RearTires.name = "RearTires"
+	dim FrontRightTire = Tires.addContainer(TL_DOWN)
+		FrontRightTire.name = "FrontRightTire"
+	dim FrontLeftTire = Tires.addContainer(TL_DOWN)
+		FrontLeftTire.name = "FrontLeftTire"
+end if
+
+	count= count+1
+	scene.updatescenetree()
+end sub
+
+sub OnExecAction(buttonId As Integer)
+	select case buttonId
+		case 0
+			BuildTree()
+		end select
+		
+end sub
+
+
+
+
+
+

@@ -1,0 +1,124 @@
+dim lokasifile, strlokasifile, cmd, nilainilai1,nilaichart3, nilainilai2,nilaichart4 as string
+dim arrstrlokasifile, arrstrisibaris,baris,barisoke,baris2,barisoke2 as Array[String] 
+dim totalbaris as integer
+dim tobar,tobar2 as double
+
+dim x as string
+sub OnInitParameters()
+	RegisterFileSelector("LokasiText", "LokasiText", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\TRENDING TOPIC\\5. komparasi_data", "tranding_topik_tokoh_1.txt", "*.txt")
+end sub
+
+sub Isi()
+
+	'ambil isi file text
+	lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	
+	for i = 0 to arrstrlokasifile.ubound  
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+		CekNilai(arrstrisibaris[0], cint(arrstrisibaris[1]))
+		CekNilai2(arrstrisibaris[0], cint(arrstrisibaris[2]))
+		CekNilai3(arrstrisibaris[0], arrstrisibaris[1])
+				
+	next
+	
+	
+	barisoke.clear
+	barisoke2.clear
+end sub
+
+Sub CekNilai(katakunci as string, nilai1 as integer)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	baris.clear
+   for i = 1 to 7
+	if katakunci = "nilai"&i  then
+	tobar = nilai1/10
+	'println (cdbl(nilai1)/10)
+	'baris.clear
+	baris.push(cstr(tobar))
+	barisoke.push(baris[0])
+	sendCommand("RENDERER*TREE*$GRAPH1*GEOM*Y"&i&" SET "&cstr(tobar))
+	'BAR1
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR1-"&i&" = " & cstr(tobar))
+	'SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR2-"&i&" = " & cstr(tobar))
+	'ANGKA1
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA1_"&i&" = " & cdbl(nilai1/10.0))
+	'SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA2_"&i&" = " & cdbl(nilai1/10.0))
+	
+	
+	
+	end if
+	next
+	
+	nilainilai1.Join(barisoke,",")
+	'println nilainilai1
+	nilaichart3 = "0,"& nilainilai1
+	scene.findcontainer("KATA").Geometry.text =  nilaichart3
+	sendCommand("RENDERER*TREE*$AREA1*FUNCTION*DataStorage*Data1 SET "& nilaichart3)
+	println nilainilai1
+
+	
+end sub
+
+Sub CekNilai2(katakunci as string, nilai1 as integer)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	baris2.clear
+   for i = 1 to 7
+	if katakunci = "nilai"&i  then
+	tobar2 = nilai1/10
+	'println (cdbl(nilai1)/10)
+	'baris.clear
+	baris2.push(cstr(tobar2))
+	barisoke2.push(baris2[0])
+	sendCommand("RENDERER*TREE*$GRAPH2*GEOM*Y"&i&" SET "&cstr(tobar2))
+	
+	'BAR2
+	'SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR1-"&i&" = " & cstr(tobar))
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET BAR2-"&i&" = " & cstr(tobar2))
+	'ANGKA1
+	'SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA1_"&i&" = " & cdbl(nilai1/10.0))
+	SendCommand("RENDERER*FUNCTION*DataPool*Data SET ANGKA2_"&i&" = " & cdbl(nilai1/10.0))
+	
+	end if
+		'baris.push(nilai1)
+	next
+	
+	nilainilai2.Join(barisoke2,",")
+	'println nilainilai1
+	nilaichart4 = "0,"& nilainilai2
+	scene.findcontainer("KATA2").Geometry.text =  nilaichart4
+	sendCommand("RENDERER*TREE*$AREA2*FUNCTION*DataStorage*Data1 SET "& nilaichart4)
+	println nilainilai2
+
+	
+	
+end sub
+
+Sub CekNilai3(katakunci as string, nilai1 as string)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	
+   for i = 1 to 7
+	if katakunci = "keterangan"&i  then
+	scene.findcontainer("KET1_"&i).Geometry.text =  nilai1
+	scene.findcontainer("KET2_"&i).Geometry.text =  nilai1
+	scene.findcontainer("KET3_"&i).Geometry.text =  nilai1
+	end if
+
+	next
+	
+	for i = 1 to 2
+	if katakunci = "legenda"&i  then
+	scene.findcontainer("JUDUL-CHART"&i).Geometry.text =  nilai1
+	scene.findcontainer("JUDUL-CHART2"&i).Geometry.text =  nilai1
+	scene.findcontainer("JUDUL-CHART3-"&i).Geometry.text =  nilai1
+	
+	'scene.findcontainer("JUDUL-CHART3-"&i).Geometry.text =  nilai1
+	end if
+	next
+	
+
+
+	
+end sub

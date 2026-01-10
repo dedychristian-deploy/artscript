@@ -1,0 +1,54 @@
+dim drag_active as boolean=false
+dim cmd_ls as string
+dim lx,ly,lz as double
+dim doubleclick_tracker as Integer
+dim konten = scene.findcontainer("group")
+
+sub OnLButtonDown()
+
+ 
+end sub
+
+sub OnLButtonUp()
+    
+        drag_active=false
+    
+end sub
+
+sub OnButtonDown6DOF(button As Integer, pos As Vertex, rot As Vertex)
+
+				drag_active=true
+
+end sub
+
+sub OnButtonUp6DOF(button As Integer, pos As Vertex, rot As Vertex)
+
+end sub
+
+sub OnMoveRelative6DOF(button As Integer, pos As Vertex, rot As Vertex)
+	'if c_grafity.active = false then
+	
+	drag_active = true
+		if drag_active = true and this.containsmousecursor() then
+			this.position.y += pos.y
+			this.position.x += pos.x
+sendCommand("RENDERER*TREE*$f*GEOM*PointValues SET "& konten.position.x &" "& konten.position.y&":"&this.position.x&" "&this.position.y)
+
+			'konten.position.x += pos.x*0.1
+			'konten.position.y += pos.y*0.1
+
+		end if
+
+end sub
+
+sub reset()
+	drag_active=false
+end sub
+
+
+
+sub OnExecPerField()
+
+
+end sub
+

@@ -1,0 +1,14 @@
+kiper : -222  0
+bek kiri  : -140 110
+bek kiri tengah  : -160 48
+bek kiri kanan: -160 30
+bek kanan: -140 -92
+
+sayap kiri: 25 110
+sayap kiri tengah  : -48 48
+sayap kanan tengah  : -48 -30
+sayap kanan: 25 -92
+
+kiri : 155 44
+kanan : 126 -36
+

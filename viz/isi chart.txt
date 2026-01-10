@@ -1,0 +1,136 @@
+dim lokasifile, strlokasifile, cmd, nilainilai1,nilaichart3, nilainilai2,nilaichart4 as string
+dim arrstrlokasifile, arrstrisibaris as Array[String] 
+'dim anticipation,joy,sadness,disgust,anger,surprise,fear,trust as Array[String]
+'dim arr_anticipation,arr_joy,arr_sadness,arr_disgust,arr_anger,arr_surprise,arr_fear,arr_trust as Array[String]
+'dim str_anticipation,str_joy,str_sadness,str_disgust,str_anger,str_surprise,str_fear,str_trust as string
+
+dim chart1,chart2,chart3,chart4,chart5 as Array[String]
+dim arr_chart1,arr_chart2,arr_chart3,arr_chart4,arr_chart5 as Array[String]
+dim str_chart1,str_chart2,str_chart3,str_chart4,str_chart5 as string
+
+dim x as string
+dim y as integer
+
+y = 1
+sub OnInitParameters()
+	RegisterParameterString("LokasiText", "LokasiText", "\\\\192.168.101.222\\onair_files\\PILKADA2017\\EBDESK\\EMOTION_PASLON1.txt", 100,200, "")
+end sub
+
+
+sub OnLButtonDown()
+	
+	chart1.clear
+	arr_chart1.clear
+	
+	chart2.clear
+	arr_chart2.clear
+	
+	chart3.clear
+	arr_chart3.clear
+	
+	chart4.clear
+	arr_chart4.clear
+	
+	chart5.clear
+	arr_chart5.clear
+	
+	
+	'ambil isi file text
+	lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(lokasifile, strlokasifile)	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+
+		chart1(arrstrlokasifile[1])
+		chart2(arrstrlokasifile[2])
+		chart3(arrstrlokasifile[3])
+		chart4(arrstrlokasifile[4])
+		chart5(arrstrlokasifile[5])
+
+
+end sub
+
+sub chart1(nilai as string)
+	'println nilai
+	for i = 1 to 3
+	nilai.split(";", arrstrisibaris)
+	
+	chart1.push(cstr(cdbl(arrstrisibaris[i]) ))	
+	next
+	
+	str_chart1.Join(chart1,",")
+	sendCommand("RENDERER*TREE*$PIE_1$PIE_LOOP$1_PIE_1*GEOM*Data SET "& str_chart1)
+	sendCommand("RENDERER*TREE*$PIE_1$PIE_LOOP$1_PIE_2*GEOM*Data SET "& str_chart1)
+	println str_chart1
+	
+end sub
+
+sub chart2(nilai as string)
+	'println nilai
+	for i = 1 to 3
+	nilai.split(";", arrstrisibaris)
+	
+	chart2.push(cstr(cdbl(arrstrisibaris[i]) ))	
+	next
+	
+	str_chart2.Join(chart2,",")
+	sendCommand("RENDERER*TREE*$PIE_2$PIE_LOOP$2_PIE_1*GEOM*Data SET "& str_chart2)
+	sendCommand("RENDERER*TREE*$PIE_2$PIE_LOOP$2_PIE_2*GEOM*Data SET "& str_chart2)
+	println str_chart2
+	
+end sub
+
+sub chart3(nilai as string)
+	'println nilai
+	for i = 1 to 3
+	nilai.split(";", arrstrisibaris)
+	
+	chart3.push(cstr(cdbl(arrstrisibaris[i]) ))	
+	next
+	
+	str_chart3.Join(chart3,",")
+	sendCommand("RENDERER*TREE*$PIE_3$PIE_LOOP$3_PIE_1*GEOM*Data SET "& str_chart3)
+	sendCommand("RENDERER*TREE*$PIE_3$PIE_LOOP$3_PIE_2*GEOM*Data SET "& str_chart3)
+	println str_chart3
+	
+end sub
+
+sub chart4(nilai as string)
+	'println nilai
+	for i = 1 to 3
+	nilai.split(";", arrstrisibaris)
+	
+	chart4.push(cstr(cdbl(arrstrisibaris[i]) ))	
+	next
+	
+	str_chart4.Join(chart4,",")
+	sendCommand("RENDERER*TREE*$PIE_4$PIE_LOOP$4_PIE_1*GEOM*Data SET "& str_chart4)
+	sendCommand("RENDERER*TREE*$PIE_4$PIE_LOOP$4_PIE_2*GEOM*Data SET "& str_chart4)
+	println str_chart4
+	
+end sub
+
+sub chart5(nilai as string)
+	'println nilai
+	for i = 1 to 3
+	nilai.split(";", arrstrisibaris)
+	
+	chart5.push(cstr(cdbl(arrstrisibaris[i]) ))	
+	next
+	
+	str_chart5.Join(chart5,",")
+	sendCommand("RENDERER*TREE*$PIE_5$PIE_LOOP$5_PIE_1*GEOM*Data SET "& str_chart5)
+	sendCommand("RENDERER*TREE*$PIE_5$PIE_LOOP$5_PIE_2*GEOM*Data SET "& str_chart5)
+	println str_chart5
+	
+end sub
+
+
+sub OnInit()
+'SendCommand("RENDERER*TREE*$#SCRIPT*SCRIPT INVOKE OnLButtonDown")
+'SendCommand("RENDERER*TREE*$#SCRIPT*SCRIPT INVOKE OnLButtonDown1")
+'SendCommand("RENDERER*TREE*$#SCRIPT*SCRIPT INVOKE OnLButtonDown2")
+println "---------------------------------------------------------------------"
+end sub
+
+
+

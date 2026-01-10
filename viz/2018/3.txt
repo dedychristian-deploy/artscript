@@ -1,0 +1,59 @@
+dim sub_dir = stage.FindDirector("SUBSTITUTION-KIRI")
+
+sub OnLButtonDown()
+if System.Map["kalender"] == "jadwal" then
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_JADWAL SHOW 0")
+	sendCommand("RENDERER*TREE*$MENU_JADWAL*ACTIVE SET FALSE")
+	
+	sendCommand("RENDERER*STAGE*DIRECTOR*$LAPANGAN SHOW 0")
+	sendCommand("RENDERER*STAGE*DIRECTOR*$LAPANGAN CONTINUE")
+	sendCommand("RENDERER*TREE*$MENU_FORMASI*ACTIVE SET TRUE")
+	
+	sub_dir.time = 0.0
+	sub_dir.Stopanimation()
+	'klik lalu cek nama tim 1 dan 2 yang akan main
+	'masuk ke formasi
+	'simpan nama tim di jadwal ini ke global variable / system.map
+	
+	dim negara_1,negara_2 as string
+	
+	negara_1 = Scene.findContainer("$1_PERTANDINGAN$PERTANDINGAN_1$TEAM_A_PERTANDINGAN_1").Geometry.text
+	negara_2 = Scene.findContainer("$1_PERTANDINGAN$PERTANDINGAN_1$TEAM_B_PERTANDINGAN_1").Geometry.text
+	
+	
+	'=========================================================================			
+		if negara_1 = "REP.IRLANDIA" then
+			negara_1 = "REPUBLIK IRLANDIA"
+		elseif negara_1 = "REP.CEKO" then
+			negara_1 = "REPUBLIK CEKO"
+		elseif negara_1 = "IRLANDIA UTR" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REP.IRLANDIA" then
+			negara_2 = "REPUBLIK IRLANDIA"
+		elseif negara_2 = "REP.CEKO" then
+			negara_2 = "REPUBLIK CEKO"
+		elseif negara_2 = "IRLANDIA UTR" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+	System.Map["Team_1"] = negara_1
+	System.Map["Team_2"] = negara_2
+	
+	'================================
+	System.Map["pertandingan"] = "1"
+	
+	'jalankan prosedur isi nama team di menu formasi
+	sendCommand("RENDERER*TREE*$LETS_CODE*SCRIPT INVOKE formasi")
+	
+	println System.Map["files"] 
+else
+	println System.Map["Team_1"] & "vstr" & System.Map["Team_2"]
+end if
+
+end sub
+
+
+
+
+

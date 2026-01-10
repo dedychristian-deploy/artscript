@@ -1,0 +1,197 @@
+dim i, x, nilai,acak1_1,counter_p,kondisi as integer
+dim send,lokasifile,strlokasifile,pemenang,pemenang1_1,pemenang1_2,arrPemenang1 as string
+dim arrstrlokasifile,arrstrisibaris,arrstrisibaris1,arrRow,arrRow2,arrRowPemenang as array[string]
+
+arrRow.Push("0")
+sub OnInitParameters()
+
+
+	RegisterParameterBool("acak_telp", "ACAK NOMOR", false)
+	RegisterParameterString("pathFile", "Path File", "D:\\\MULTIMEDIA\\BATIK AIR\\", 50, 256, "")
+	RegisterParameterString("namaFile", "Nama file", "pemenang.txt", 50, 50, "")	
+		
+end sub
+
+sub Isi()
+
+	'ambil isi file text
+	lokasifile = GetParameterString("pathFile") & GetParameterString("namaFile")
+	System.LoadTextFile(lokasifile, strlokasifile)
+
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	'println arrstrlokasifile.ubound-1
+	
+	for i = 0 to arrstrlokasifile.ubound-1
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+				
+	next
+		send = "RENDERER*TREE*$ACAKACAK2*GEOM*TEXT SET 0000000000000"  
+		SendCommand(send)
+		send = "RENDERER*TREE*$TELEPON_1*GEOM*TEXT SET 000000000000000"  
+		SendCommand(send)
+end sub
+
+
+
+
+sub OnExecPerField()
+
+	x = CInt(GetParameterBool("acak_telp"))
+	acak1_1 = random(Cint(arrstrlokasifile.ubound-1))
+	
+if 	x = 1 then
+
+		arrstrlokasifile.ubound-1
+		
+		'for i = 0 to arrstrlokasifile.ubound-1
+		
+		arrstrlokasifile[random(Cint(arrstrlokasifile.ubound))].split(";", arrstrisibaris) 
+		println arrstrisibaris[0]
+		
+		send = "RENDERER*TREE*$ACAKACAK2*GEOM*TEXT SET " & arrstrisibaris[0] 
+		SendCommand(send)
+		
+		pemenang1_1 = arrstrisibaris[0]
+		pemenang1_2 = arrstrisibaris[1] 
+		pemenang = pemenang1_1 & ";" & pemenang1_2
+		
+'		pemenang1_1 = "0169832156986"
+'		pemenang1_2 = "015770891XXX" 
+'		pemenang = pemenang1_1 & ";" & pemenang1_2
+		
+
+elseif x = 0 then
+
+end if
+
+	
+		
+end sub
+
+sub pemenang()
+'Isi()
+	
+	
+	'counter_p = counter_p + 1
+
+	
+	cek (pemenang)
+	
+'	arrRow.Push(pemenang)
+'	'println arrRow
+'	'println pemenang
+'	for i = 0 to arrRow.ubound-1
+'	'masukan pemenang ke array pemenang, lalu bandingkan.
+'	if pemenang = arrRow[i] then
+'	println "sama"
+'	kondisi = 0
+'		
+'	'	elseif arrRow[0].length = 0 then
+'	'	arrRow2.Push(pemenang)
+'	'	println arrRow2
+'	
+'	else
+'	
+'	println "beda"
+'	kondisi  = 1
+'	
+'	
+'	'println arrRow2
+'	arrPemenang1 = pemenang
+'	'arrRow2.Push(arrPemenang1)
+'	println pemenang
+'
+'	
+'	end if
+'	
+'	next
+'	
+'	'cek kondisi
+'	
+''	if kondisi = 1 then
+''	
+''	arrRowPemenang.push(arrRow2[arrRow2.ubound - 1])
+''	println arrRowPemenang
+''	
+''	elseif kondisi = 0 then
+''	
+''	
+''	end if
+''	
+	
+
+
+end sub
+
+sub cek (dataPemenang as string)
+
+	arrRow.Push(dataPemenang)
+	'println arrRow
+	'println pemenang
+	for i = 0 to arrRow.ubound-1
+	'masukan pemenang ke array pemenang, lalu bandingkan.
+	if dataPemenang = arrRow[i] then
+	println "sama"
+	kondisi = 0
+	
+'	arrPemenang1 = dataPemenang
+'	'arrRow2.Push(arrPemenang1)
+'	println dataPemenang
+'	println arrRow
+	
+	dataPemenang = arrstrlokasifile[random(Cint(arrstrlokasifile.ubound))]
+	cek(dataPemenang)
+
+	else
+	
+	println "beda"
+	kondisi  = 1
+	
+	
+	'println arrRow2
+	arrPemenang1 = dataPemenang
+	'arrRow2.Push(arrPemenang1)
+	println dataPemenang
+	println arrRow
+
+	arrRow[arrRow.ubound].split(";", arrstrisibaris1) 
+	
+	'NOMOR TELEPON TANPA KEY
+	send = "RENDERER*TREE*$TELEPON_1*GEOM*TEXT SET " & arrstrisibaris1[1]
+	SendCommand(send)
+	
+	
+	arrstrisibaris1[1].Replace(8,16,"XXX" ) 
+	println arrstrisibaris1[1]
+	
+	send = "RENDERER*TREE*$TELEPON*GEOM*TEXT SET " & arrstrisibaris1[1]
+	SendCommand(send)
+	send = "RENDERER*TREE*$ACAKACAK2*GEOM*TEXT SET " & arrstrisibaris1[0]
+	SendCommand(send)
+	
+	'arrstrisibaris1[1].Replace(8,15,"XXX" ) 
+	'println arrstrisibaris1[1]
+
+	
+	end if
+	
+	next
+	
+
+	
+end sub
+
+sub OnLButtonDown()
+
+	send = "RENDERER*STAGE*DIRECTOR*CG_ACAK SHOW 0 " 
+	SendCommand(send)
+	
+	arrRow.clear()
+
+end sub
+
+sub OnLButtonUp()
+'Isi()
+end sub
+

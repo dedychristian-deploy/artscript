@@ -1,0 +1,44 @@
+dim lokasifile, strlokasifile, cmd as string
+dim arrstrlokasifile, arrstrisibaris as Array[String] 
+dim totalbaris as integer
+dim x as string
+sub OnInitParameters()
+	RegisterFileSelector("LokasiText", "LokasiText", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\TRENDING TOPIC\\3. tokoh", "tranding_topik_tokoh_1.txt", "*.txt")
+end sub
+
+sub Isi()
+
+	'ambil isi file text
+	lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	
+	for i = 0 to arrstrlokasifile.ubound
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+		CekNilai(arrstrisibaris[0], arrstrisibaris[1])
+				
+	next
+	
+	
+	
+end sub
+
+Sub CekNilai(katakunci as string, nilai as string)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	Scene.FindContainer(katakunci).Geometry.Text = nilai
+	if katakunci = "PATH_IMAGE" then
+	cmd = "RENDERER*TREE*$PATH_IMAGE*FUNCTION*ControlImage*input SET " & nilai
+	SendCommand(cmd)
+	'#643630*FUNCTION*ControlImage*image_prefix SET ASDF.JPG
+	end if
+	
+end sub
+
+
+sub OnLButtonDown()
+	Isi()
+end sub
+
+sub OnLButtonUp()
+end sub

@@ -1,0 +1,1672 @@
+dim TeamFormation as string
+dim lokasifile,strlokasifile as string
+dim arrstrlokasifile, arrstrisibaris as Array[String] 
+dim t_arrstrlokasifile, t_arrstrisibaris as Array[String]
+dim team_a,team_b,negara_1,negara_2 as string
+dim i,x as integer
+dim nm_month as string
+
+dim juni_dir = stage.FindDirector("JADWAL_JUNI")
+dim juli_dir = stage.FindDirector("JADWAL_JULI")
+
+sub OnInitParameters()
+	'RegisterParameterString("formasi", "Formasi", "4-4-2", 15, 50, "")
+	RegisterParameterString("LokasiText", "Data Pemain", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\PROFIL_PEMAIN\\", 80, 265, "")
+	RegisterParameterString("jadwal", "Jadwal Pertandingan", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\JADWAL\\", 80, 265, "")
+	RegisterParameterString("klasemen", "Klasemen", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\KLASEMEN\\", 80, 265, "")
+	RegisterParameterString("top", "Top Scorer", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\TOP_SCORER\\", 80, 265, "")
+	RegisterParameterString("profil", "Profil Pemain", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\PROFIL_PEMAIN\\", 80, 265, "")
+	RegisterParameterString("jersey", "Jersey", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\JERSEY\\", 80, 265, "")
+	'RegisterParameterString("profil", "Profil Pemain", "\\\\192.168.101.222\\onair_files\\EURO2016\\FORMAT_DATA\\PROFIL_PEMAIN\\", 80, 265, "")
+end sub
+
+sub OnParameterChanged(parameterName As String)
+	if (parameterName = "formasi") then
+		TeamFormation = GetParameterString(parameterName) 		
+	end if	
+end sub
+
+sub formasi()
+	team_a = System.Map["Team_1"]
+	team_b = System.Map["Team_2"]
+	
+	scene.findContainer("$TEAM-1$NAME_TEAM-1").Geometry.text = team_a
+	scene.findContainer("$TEAM-2$NAME_TEAM-2").Geometry.text = team_b 
+	
+	'cek formasi team untuk setiap negara,diambil dari txt files.
+	jersey(System.Map["files"],System.Map["pertandingan"])
+	read_file(team_a,1)
+	read_file2(team_b,2)
+	
+end sub
+
+sub read_file(files as string,li_team as integer)
+	
+	dim temp_i as integer
+	dim temp_s as string
+	dim pelatih as string
+	dim li_formation as string
+	
+	'baca file
+	lokasifile = GetParameterString("LokasiText") & files & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+	
+	arrstrlokasifile[0].split(";", arrstrisibaris) 
+	pelatih = arrstrisibaris[0]
+	pelatih.MakeUpper()
+	scene.findcontainer("PELATIH-TEAM1").Geometry.Text = pelatih
+	scene.findcontainer("FORMASI-TEAM1").Geometry.Text = arrstrisibaris[1]
+	li_formation = arrstrisibaris[1]
+	
+	for x = 1 to 24
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		temp_s = arrstrisibaris[2]
+		temp_s.MakeUpper()
+		scene.findcontainer( "T" & li_team &"_" & x).Geometry.Text = temp_s
+		scene.findcontainer( "T" & li_team &"_" & x & "_NO").Geometry.Text = arrstrisibaris[0]
+		scene.findcontainer( "T" & li_team &"_" & x & "_PROFIL").Geometry.Text = arrstrlokasifile[x]
+	
+	next
+	
+			if li_formation = "4-4-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-70,127, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-95,51, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-95,-37, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-70,-101, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-33,36, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,-21, 0)
+			
+			elseif li_formation = "4-4-1-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-70,127, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-95,51, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-95,-37, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-70,-101, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-57.571,5.143, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-17.43,5.143, 0)
+			
+			elseif li_formation = "4-3-3" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-91,88, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-105,1, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-91,-80, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-30,66, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-40,8, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-30,-55, 0)
+
+			elseif li_formation = "4-2-3-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-128,37, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-128,-23, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-55,82, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-87,8, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-55,-72, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-29,8, 0)
+			
+			elseif li_formation = "4-1-3-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-130,4, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-67,96, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-80,4, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-67,-90, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-33,36, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,-21, 0)
+			
+			elseif li_formation = "4-3-2-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-111,82, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-120,8, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-111,-72, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-66,37, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-66,-23, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-29,8, 0)
+
+			elseif li_formation = "4-3-1-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-111,82, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-120,8, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-111,-72, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-72,8, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-29,37, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-29,-23, 0)
+			
+			elseif li_formation = "4-5-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-158,123, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-178,51, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-178,-37, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-158,-100, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-47,121, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-111,82, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-137,8, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-111,-72, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-47,-96, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,8, 0)
+			
+			
+			elseif li_formation = "3-5-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-45,123, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-94,83, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-112,7, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-94,-67, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-45,-105, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-28,37, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-29,-30, 0)
+			
+			elseif li_formation = "3-4-3" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-75,115, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-113,51, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-113,-26, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-75,-98, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-27,66, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-27,8, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-27,-52, 0)
+			
+			elseif li_formation = "3-4-1-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-75,115, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-113,51, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-113,-26, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-75,-98, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-66,7, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-27,66, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-27,-52, 0)
+			
+			elseif li_formation = "3-4-2-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-75,115, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-113,51, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-113,-26, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-75,-98, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-53,66, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-53,-52, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,8, 0)
+			
+			elseif li_formation = "3-6-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-32,136, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-69,91, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-113,51, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-113,-26, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-69,-67, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-32,-110, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,8, 0)
+			
+			
+			elseif li_formation = "5-4-1" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-128,135, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-120,-108, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-69,91, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-113,51, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-113,-26, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-69,-67, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-30,8, 0)
+			
+			
+			elseif li_formation = "5-3-2" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-128,135, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-120,-108, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-81,80, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-105,8, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-81,-60, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-33,36, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-33,-21, 0)
+			
+			elseif li_formation = "5-2-3" then
+			
+			scene.findcontainer("TEAM1_KIPER").Position.XYZ = cvertex(-230,5, 0)
+			scene.findcontainer("TEAM1_1").Position.XYZ = cvertex(-128,135, 0)
+			scene.findcontainer("TEAM1_2").Position.XYZ = cvertex(-168,85, 0)
+			scene.findcontainer("TEAM1_3").Position.XYZ = cvertex(-176,7, 0)
+			scene.findcontainer("TEAM1_4").Position.XYZ = cvertex(-168,-72, 0)
+			scene.findcontainer("TEAM1_5").Position.XYZ = cvertex(-128,-108, 0)
+			scene.findcontainer("TEAM1_6").Position.XYZ = cvertex(-95,36, 0)
+			scene.findcontainer("TEAM1_7").Position.XYZ = cvertex(-95,-21, 0)
+			scene.findcontainer("TEAM1_8").Position.XYZ = cvertex(-30,-60, 0)
+			scene.findcontainer("TEAM1_9").Position.XYZ = cvertex(-30,8, 0)
+			scene.findcontainer("TEAM1_10").Position.XYZ = cvertex(-30,80, 0)
+			
+			
+			end if			
+			
+			
+	for i = 1 to files.length
+		
+			if cstr(files.GetChar(i)) = " " then
+				println "char at " & i & " == " &files.GetChar(i)
+				temp_i = i
+				
+				'ganti spasi dengan "_"
+				files.ReplaceChar(temp_i, "_")
+				Exit For
+			end if
+			
+	next
+	
+	sendCommand("RENDERER*TREE*$BENDERA-TEAM1*FUNCTION*ControlImage*input SET " & files)	
+	sendCommand("RENDERER*TREE*$TEAM1_1*FUNCTION*ControlImage*input SET " & files & "-" & System.Map["home"])	 
+
+end sub
+
+sub read_file2(files as string,li_team as integer)
+	
+	dim temp_i as integer
+	dim temp_s as string
+	dim pelatih as string
+	dim li_formation as string
+
+
+	'baca file
+	lokasifile = GetParameterString("LokasiText") & files & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+	
+
+	arrstrlokasifile[0].split(";", arrstrisibaris) 
+	pelatih = arrstrisibaris[0]
+	pelatih.MakeUpper()
+	scene.findcontainer("PELATIH-TEAM2").Geometry.Text = pelatih
+	scene.findcontainer("FORMASI-TEAM2").Geometry.Text = arrstrisibaris[1]
+	li_formation = arrstrisibaris[1]
+	
+	for x = 1 to 24
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		temp_s = arrstrisibaris[2]
+		temp_s.MakeUpper()
+		scene.findcontainer( "T" & li_team &"_" & x).Geometry.Text = temp_s
+		scene.findcontainer( "T" & li_team &"_" & x & "_NO").Geometry.Text = arrstrisibaris[0]
+		scene.findcontainer( "T" & li_team &"_" & x & "_PROFIL").Geometry.Text = arrstrlokasifile[x]
+	
+	next
+	
+
+	'formasi
+			if li_formation = "4-4-2" then
+			' formasi 4-4-2
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(70,127, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(95,51, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(95,-37, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(70,-101, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(33,36, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(33,-21, 0)
+			
+			elseif li_formation = "4-4-1-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(70,127, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(95,51, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(95,-37, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(70,-101, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(57.571,5.143, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(17.43,5.143, 0)
+			
+			elseif li_formation = "4-3-3" then
+			' formasi 4-3-3
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(91,88, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(105,1, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(91,-80, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(30,66, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(40,8, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(30,-55, 0)
+			
+			
+			elseif li_formation = "4-2-3-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(128,37, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(128,-23, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(55,82, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(87,8, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(55,-72, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(29,8, 0)
+			
+			elseif li_formation = "4-1-3-2" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(150,4, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(67,96, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(80,4, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(67,-90, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(33,36, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(33,-21, 0)
+			
+			elseif li_formation = "4-3-2-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(111,82, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(120,8, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(111,-72, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(66,37, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(66,-23, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(29,8, 0)
+
+			elseif li_formation = "4-3-1-2" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(111,82, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(120,8, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(111,-72, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(72,8, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(29,37, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(29,-23, 0)
+			
+			elseif li_formation = "4-5-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(158,123, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(178,51, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(178,-37, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(158,-100, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(47,121, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(111,82, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(137,8, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(111,-72, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(47,-96, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(31,8, 0)
+			
+			
+			
+			elseif li_formation = "3-5-2" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(45,123, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(94,83, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(112,7, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(94,-67, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(45,-105, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(28,37, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(29,-23, 0)
+			
+			elseif li_formation = "3-4-3" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(75,115, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(113,51, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(113,-26, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(75,-98, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(27,66, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(27,8, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(27,-52, 0)
+			
+			elseif li_formation = "3-4-1-2" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(75,115, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(113,51, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(113,-26, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(75,-98, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(66,8, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(27,66, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(27,-52, 0)
+			
+			elseif li_formation = "3-4-2-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(75,115, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(113,51, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(113,-26, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(75,-98, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(53,66, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(53,-52, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(27,8, 0)
+			
+			elseif li_formation = "3-6-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(32,136, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(69,91, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(113,51, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(113,-26, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(69,-67, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(32,-110, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(27,8, 0)
+			
+			
+			elseif li_formation = "5-4-1" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(128,135, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(128,-108, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(69,91, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(113,51, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(113,-26, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(69,-67, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(27,8, 0)
+			
+			
+			elseif li_formation = "5-3-2" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(128,135, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(128,-108, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(81,88, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(105,1, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(81,-80, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(33,36, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(33,-21, 0)
+			
+			elseif li_formation = "5-2-3" then
+			
+			scene.findcontainer("TEAM2_KIPER").Position.XYZ = cvertex(230,5, 0)
+			scene.findcontainer("TEAM2_1").Position.XYZ = cvertex(128,135, 0)
+			scene.findcontainer("TEAM2_2").Position.XYZ = cvertex(168,85, 0)
+			scene.findcontainer("TEAM2_3").Position.XYZ = cvertex(176,7, 0)
+			scene.findcontainer("TEAM2_4").Position.XYZ = cvertex(168,-72, 0)
+			scene.findcontainer("TEAM2_5").Position.XYZ = cvertex(128,-108, 0)
+			scene.findcontainer("TEAM2_6").Position.XYZ = cvertex(95,36, 0)
+			scene.findcontainer("TEAM2_7").Position.XYZ = cvertex(95,-21, 0)
+			scene.findcontainer("TEAM2_8").Position.XYZ = cvertex(30,88, 0)
+			scene.findcontainer("TEAM2_9").Position.XYZ = cvertex(30,8, 0)
+			scene.findcontainer("TEAM2_10").Position.XYZ = cvertex(30,-80, 0)
+
+			end if			
+					
+	for i = 1 to files.length
+		
+			if cstr(files.GetChar(i)) = " " then
+				println "char at " & i & " == " &files.GetChar(i)
+				temp_i = i
+				
+				'ganti spasi dengan "_"
+				files.ReplaceChar(temp_i, "_")
+				Exit For
+			end if
+			
+	next
+	
+	sendCommand("RENDERER*TREE*$BENDERA-TEAM2*FUNCTION*ControlImage*input SET " & files)
+	sendCommand("RENDERER*TREE*$TEAM2_1*FUNCTION*ControlImage*input SET " & files & "-" & System.Map["away"])
+
+end sub
+'profil file
+sub profil_file(files as string,li_team as integer)
+	
+	dim temp_i as integer
+	dim temp_s as string
+	dim pelatih as string
+	dim li_formation as string
+
+	lokasifile = GetParameterString("profil") & files & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+	
+	for x = 1 to 24
+	
+		scene.findcontainer( "T" & li_team &"_" & x & "_PROFIL").Geometry.Text = arrstrlokasifile[x]
+		println arrstrlokasifile[x]
+	
+	next
+
+
+end sub
+
+sub profil_team(files as string)
+	
+	dim temp_i as integer
+	dim temp_s as string
+	dim pelatih as string
+	dim li_formation as string
+
+	lokasifile = GetParameterString("profil") & files & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+	
+	arrstrlokasifile[0].split(";", arrstrisibaris) 
+	scene.findcontainer( "$HEAD_PELATIH$PELATIH").Geometry.Text = arrstrisibaris[0]		
+	scene.findcontainer( "$HEAD_NEGARA$PROFIL_NEGARA").Geometry.Text = files		
+	
+'		scene.findcontainer( "T" & li_team &"_" & x & "_PROFIL").Geometry.Text = arrstrlokasifile[x]
+'		println files
+
+	for x = 1 to 30	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 	
+		scene.findcontainer( "$PEMAIN_" & x & "$SUBTITUTION-1").Geometry.Text = arrstrisibaris[2]	
+		scene.findcontainer( "$PEMAIN_" & x & "$SUBTITUTION-1-INFO").Geometry.Text = arrstrlokasifile[x]	
+		println arrstrisibaris[1]	
+	next
+	
+	sendCommand("RENDERER*TREE*$IMAGE_PELATIH*FUNCTION*ControlImage*input SET " & GetParameterString("profil") & files & "\\00")
+	sendCommand("RENDERER*TREE*$IMAGE_PELATIH*FUNCTION*ControlImage*input SET " & GetParameterString("profil") & files & "\\PELATIH.JPG")
+	
+	for i = 1 to files.length
+	
+		if cstr(files.GetChar(i)) = " " then
+			println "char at " & i & " == " &files.GetChar(i)
+			temp_i = i
+			
+			'ganti spasi dengan "_"
+			files.ReplaceChar(temp_i, "_")
+			Exit For
+		end if
+			
+	next
+	
+	sendCommand("RENDERER*TREE*$ICON_NEGARA_1*FUNCTION*ControlImage*input SET " & files)
+	
+		
+
+end sub
+
+sub read_jadwal(date as integer, month as string, match as integer)
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+	
+	dictArray.clear()
+	temp_Array.clear()
+	int_i = 0
+	int_x = 0
+
+	'baca file
+	lokasifile = GetParameterString("jadwal") & "JADWAL_" & date & "_" & month & "_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	'println lokasifile
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+	
+	'jadwal
+	for x = 0 to arrstrlokasifile.ubound
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		temp_j = arrstrisibaris[4]
+		temp_j.MakeUpper()
+		dictArray.push(temp_j)
+
+		
+	next	
+	 
+	'Ngecek tapi hanya untuk 2 group aja.
+	'APAKAH ADA CARA LAIN ?
+	dictArray.ubound
+	for x = 0 to dictArray.ubound
+			if dictArray[x] = dictArray[x+1] then
+
+			else
+
+					temp_a = dictArray[x]						
+					temp_b = dictArray[x+1]		
+					Exit For
+				   
+			end if
+	next
+
+	'jadwal
+	for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[x].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+		Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$ATAS$JADWAL").Geometry.Text = date & " "& nm_month & " 2016"
+		Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$ATAS$JADWAL").Geometry.Text = date & " "& nm_month & " 2016"
+		if temp_gr_a = temp_a and temp_a <> "" then
+		
+			
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$ATAS$GRUP").Geometry.Text = "GRUP " & temp_a
+				
+			elseif temp_gr_a = temp_b and temp_b <> "" then
+			
+			
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$ATAS$GRUP").Geometry.Text = "GRUP " & temp_b
+			
+			else 		
+			
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$ATAS$JADWAL").Geometry.Text = date & " "& nm_month & " 2016"
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$ATAS$GRUP").Geometry.Text = "GRUP " & temp_a	
+			
+		end if
+				
+				
+		if System.Map["kalender"]== "jadwal" then
+			
+			if match = 4 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			
+			elseif match = 3 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			
+			elseif match = 2 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			
+			elseif match = 1 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			end if
+			
+		elseif System.Map["kalender"]== "hasil" then
+			
+			if match = 4 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3] & ") " & negara_2
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " (" & t_arrstrisibaris[2] 
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3]&") " & negara_2
+			
+			elseif match = 3 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2] 
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY-2$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3]&") " & negara_2
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2] 
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3]&") " & negara_2
+			
+			elseif match = 2 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]  
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3]&") " & negara_2
+			
+			elseif match = 1 then
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]  
+			Scene.findContainer("$"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3]&") " & negara_2
+			end if
+				
+		end if			
+		
+	next
+		'println match
+		println "pertandingan tanggal "& date & ", "& month & " 2016, " & match & " PERTANDINGAN"
+	
+end sub
+
+sub show_schedule(date as integer, month as integer ,match as integer)
+	'harus ada jumlah pertandingan setiap jadwal
+	if month = 1 then 'dan jumlah pertandingan , agar diaktifkan dan yang diisi template sesuai jadwal pertandingan
+	nm_month = "JUNI"
+	
+
+	'read txt jadwal
+	read_jadwal(date,nm_month,match)
+	System.Map["files"] = date & "_" & nm_month & "_2016"
+	
+	
+	'jalankan director jadwal
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_JADWAL SHOW 0")
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_JADWAL CONTINUE")
+	
+	'director kalender show 0
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_KALENDER_JADWAL SHOW 0")
+	
+	
+		if match = 4 then
+		sendCommand("RENDERER*TREE*$4_PERTANDINGAN*ACTIVE SET TRUE")
+		sendCommand("RENDERER*TREE*$3_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$2_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$1_PERTANDINGAN*ACTIVE SET FALSE")
+		
+		elseif match = 3 then
+		sendCommand("RENDERER*TREE*$4_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$3_PERTANDINGAN*ACTIVE SET TRUE")
+		sendCommand("RENDERER*TREE*$2_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$1_PERTANDINGAN*ACTIVE SET FALSE")
+		
+		elseif match = 2 then
+		sendCommand("RENDERER*TREE*$4_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$3_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$2_PERTANDINGAN*ACTIVE SET TRUE")
+		sendCommand("RENDERER*TREE*$1_PERTANDINGAN*ACTIVE SET FALSE")
+		
+		elseif match = 1 then
+		sendCommand("RENDERER*TREE*$4_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$3_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$2_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$1_PERTANDINGAN*ACTIVE SET TRUE")
+		
+		end if
+	
+	end if
+	
+	
+
+end sub
+
+sub show_schedule_ko(date as integer, month as integer ,match as integer)
+	
+	'jalankan director jadwal
+	
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_JADWAL_KO SHOW 0")
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_JADWAL_KO CONTINUE")
+	
+	'director kalender show 0
+	sendCommand("RENDERER*STAGE*DIRECTOR*$IN_OUT_KALENDER_JADWAL SHOW 0")
+		
+	if match = 3 then
+		sendCommand("RENDERER*TREE*$KO_3_PERTANDINGAN*ACTIVE SET TRUE")
+		sendCommand("RENDERER*TREE*$KO_2_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$KO_1_PERTANDINGAN*ACTIVE SET FALSE")
+	
+	elseif match = 2 then
+		sendCommand("RENDERER*TREE*$KO_3_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$KO_2_PERTANDINGAN*ACTIVE SET TRUE")
+		sendCommand("RENDERER*TREE*$KO_1_PERTANDINGAN*ACTIVE SET FALSE")
+	
+	elseif match = 1 then
+		sendCommand("RENDERER*TREE*$KO_3_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$KO_2_PERTANDINGAN*ACTIVE SET FALSE")
+		sendCommand("RENDERER*TREE*$KO_1_PERTANDINGAN*ACTIVE SET TRUE")	
+	end if
+		
+	'harus ada jumlah pertandingan setiap jadwal
+	if month = 1 then 
+	nm_month = "JUNI"
+	elseif month = 2 then 
+	nm_month = "JULI"
+	end if
+	
+	System.Map["files"] = date & "_" & nm_month & "_2016"
+	
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+	
+	dictArray.clear()
+	temp_Array.clear()
+	int_i = 0
+	int_x = 0
+
+	'baca file
+	lokasifile = GetParameterString("jadwal") & "JADWAL_" & date & "_" & nm_month & "_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	
+	'println lokasifile
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+	
+	'jadwal
+	for x = 0 to arrstrlokasifile.ubound
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		temp_j = arrstrisibaris[4]
+		temp_j.MakeUpper()
+		dictArray.push(temp_j)
+		
+	next	
+	 
+	'Ngecek tapi hanya untuk 2 group aja.
+	'APAKAH ADA CARA LAIN ?
+	dictArray.ubound
+	for x = 0 to dictArray.ubound
+			if dictArray[x] = dictArray[x+1] then
+
+			else
+
+					temp_a = dictArray[x]						
+					temp_b = dictArray[x+1]		
+					Exit For
+				   
+			end if
+	next
+	
+	'jadwal
+	for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[x].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		println System.Map["fase"] & "  "  & match 
+		
+		Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$ATAS$JADWAL").Geometry.Text = date & " "& nm_month & " 2016"
+		Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$ATAS$GRUP").Geometry.Text = System.Map["fase"]
+				
+				
+		if System.Map["kalender"]== "jadwal" then
+			'println t_arrstrisibaris[0] & t_arrstrisibaris[1] & t_arrstrisibaris[2]
+			
+			if match = 3 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			
+			elseif match = 2 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			
+			elseif match = 1 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = negara_2
+			end if
+			
+		elseif System.Map["kalender"]== "hasil" then
+		
+		
+			if match = 3 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3] & ") " & negara_2
+			
+			elseif match = 2 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3] & ") " & negara_2
+			
+			elseif match = 1 then
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_A_PERTANDINGAN_" & x+1).Geometry.Text = negara_1 & " ("&t_arrstrisibaris[2]
+			Scene.findContainer("$KO_"&match&"_PERTANDINGAN$BODY$BAWAH$PERTANDINGAN_"&x+1&"$TEAM_B_PERTANDINGAN_" & x+1).Geometry.Text = t_arrstrisibaris[3] & ") " & negara_2
+			end if			
+				
+		end if			
+		
+	next
+		println match
+		println "pertandingan tanggal "& date & ", "& nm_month & " 2016, " & match & " PERTANDINGAN"
+
+	
+'	end if
+
+end sub
+
+sub show_klasemen(group as string)
+	Scene.findContainer("GRUP_KLASEMEN").Geometry.Text = "GRUP " & group
+	'baca file
+	lokasifile = GetParameterString("klasemen") & "GROUP " & group & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+
+	for x = 0 to 4
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		scene.findcontainer( "$KLASEMEN-" & x+1 & "$NEGARA").Geometry.Text = arrstrisibaris[0]
+		scene.findcontainer( "$KLASEMEN-" & x+1 & "$JUMLAH-MAIN").Geometry.Text = arrstrisibaris[1]
+		scene.findcontainer( "$KLASEMEN-" & x+1 & "$JUMLAH-GOL").Geometry.Text = arrstrisibaris[2]
+		scene.findcontainer( "$KLASEMEN-" & x+1 & "$JUMLAH-POIN").Geometry.Text = arrstrisibaris[3]
+		
+	next
+	
+end sub
+
+sub show_top()
+
+	'baca file
+	lokasifile = GetParameterString("top") & "TOP_SCORER.txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+
+	for x = 0 to 5
+	
+		arrstrlokasifile[x].split(";", arrstrisibaris) 
+		scene.findcontainer( "$TOP-" & x+1 & "$PEMAIN").Geometry.Text = arrstrisibaris[0]
+		scene.findcontainer( "$TOP-" & x+1 & "$NEGARA").Geometry.Text = arrstrisibaris[1]
+		scene.findcontainer( "$TOP-" & x+1 & "$JUMLAH-GOL").Geometry.Text = arrstrisibaris[2]
+		
+	next
+	
+end sub
+
+sub show_16_besar1()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	jersey("25_JUNI_2016","3")
+	lokasifile = GetParameterString("jadwal") & "JADWAL_25_JUNI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	for x = 0 to 2
+	
+		t_arrstrlokasifile[x].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$25_JUNI-"&x+1&"$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$25_JUNI-"&x+1&"$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$25_JUNI-"&x+1&"$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$25_JUNI-"&x+1&"$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	next
+end sub
+
+sub show_16_besar2()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	jersey("26_JUNI_2016","3")
+	lokasifile = GetParameterString("jadwal") & "JADWAL_26_JUNI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	for x = 0 to 2
+	
+		t_arrstrlokasifile[x].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$26_JUNI-"&x+1&"$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$26_JUNI-"&x+1&"$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$26_JUNI-"&x+1&"$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$26_JUNI-"&x+1&"$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	next
+end sub
+
+sub show_16_besar3()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	jersey("27_JUNI_2016","2")
+	lokasifile = GetParameterString("jadwal") & "JADWAL_27_JUNI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	for x = 0 to 1
+	
+		t_arrstrlokasifile[x].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$27_JUNI-"&x+1&"$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$27_JUNI-"&x+1&"$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$27_JUNI-"&x+1&"$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$27_JUNI-"&x+1&"$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	next
+end sub
+
+sub show_8_besar1()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	jersey("30_JUNI_2016","1")
+	lokasifile = GetParameterString("jadwal") & "JADWAL_30_JUNI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$30_JUNI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$30_JUNI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$30_JUNI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$30_JUNI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+sub show_8_besar2()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	
+	jersey("1_JULI_2016","1")
+	
+	lokasifile = GetParameterString("jadwal") & "JADWAL_1_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$1_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$1_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$1_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$1_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+			println "semi 2 : >>>>>>> " & negara_1 
+	'next
+end sub
+
+sub show_8_besar3()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	
+	jersey("2_JULI_2016","1")
+	
+	lokasifile = GetParameterString("jadwal") & "JADWAL_2_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$2_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$2_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$2_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$2_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+sub show_8_besar4()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	
+	jersey("3_JULI_2016","1")
+	
+	lokasifile = GetParameterString("jadwal") & "JADWAL_3_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$3_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$3_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$3_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$3_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+sub semi_1()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	jersey("6_JULI_2016","1")
+
+	lokasifile = GetParameterString("jadwal") & "JADWAL_6_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$6_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$6_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$6_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$6_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+sub semi_2()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	
+	jersey("7_JULI_2016","1")
+	
+	lokasifile = GetParameterString("jadwal") & "JADWAL_7_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$7_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$7_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$7_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$7_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+sub final_1()
+	dim temp_j as string
+	dim temp_a,temp_b as string
+	dim int_i,int_x as integer
+	dim temp_gr_a as string
+	dim temp_gr_b as string
+	
+	dim dictArray as Array[String]
+	dim temp_Array as Array[String]
+	dim temp_arrstrlokasifile as Array[String]
+
+	int_i = 0
+	int_x = 0
+	
+	
+	jersey("10_JULI_2016","1")
+	
+	lokasifile = GetParameterString("jadwal") & "JADWAL_10_JULI_2016" & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), t_arrstrlokasifile)
+
+	'jadwal
+	'for x = 0 to t_arrstrlokasifile.ubound - 1
+	
+		t_arrstrlokasifile[0].split(";", t_arrstrisibaris) 
+		temp_gr_a = t_arrstrisibaris[4] 
+		temp_gr_a.MakeUpper()		
+		
+		negara_1 = t_arrstrisibaris[0]
+		negara_2 = t_arrstrisibaris[1]
+		
+		'=========================================================================			
+		if negara_1 = "REPUBLIK IRLANDIA" then
+			negara_1 = "REP.IRLANDIA"
+		elseif negara_1 = "REPUBLIK CEKO" then
+			negara_1 = "REP.CEKO"
+		elseif negara_1 = "IRLANDIA UTARA" then
+			negara_1 = "IRLANDIA UTARA"
+		'=========================================================================			
+		elseif negara_2 = "REPUBLIK IRLANDIA" then
+			negara_2 = "REP.IRLANDIA"
+		elseif negara_2 = "REPUBLIK CEKO" then
+			negara_2 = "REP.CEKO"
+		elseif negara_2 = "IRLANDIA UTARA" then
+			negara_2 = "IRLANDIA UTARA"
+		end if
+		
+			Scene.findContainer("$10_JULI-1$NEGARA-1").Geometry.Text = negara_1 
+			Scene.findContainer("$10_JULI-1$NEGARA-2").Geometry.Text = negara_2 
+			Scene.findContainer("$10_JULI-1$SKOR-1").Geometry.Text = t_arrstrisibaris[2] 
+			Scene.findContainer("$10_JULI-1$SKOR-2").Geometry.Text = t_arrstrisibaris[3] 
+	'next
+end sub
+
+
+
+sub reset()
+	sendCommand("RENDERER*TREE*$ALL_JADWAL*ACTIVE SET FALSE")
+end sub
+
+sub animasi()
+
+	println "ini bulan >>> " &System.Map["ket_bulan"]
+	
+	if System.Map["ket_bulan"] == "juni" then 
+	
+	juni_dir.time = 0.0 
+	juni_dir.Continueanimation()
+	juli_dir.time = 0.0 
+	juli_dir.Stopanimation()
+	
+	elseif System.Map["ket_bulan"] == "juli" then
+	
+	juli_dir.time = 0.0 
+	juli_dir.Continueanimation()
+	juni_dir.time = 0.0 
+	juni_dir.Stopanimation()
+	
+	end if
+	
+end sub
+
+sub jersey(jadwal as string,pertandingan as string)
+
+	dim num as integer
+
+	lokasifile = GetParameterString("jersey") & "JADWAL_" & jadwal & ".txt" 
+	System.LoadTextFile(lokasifile, strlokasifile)
+	strlokasifile.split(Chr(10), arrstrlokasifile)	
+	
+	arrstrlokasifile[cint(pertandingan) - 1 ].split(";", arrstrisibaris) 
+	
+	System.Map["home"] = arrstrisibaris[0]
+	System.Map["away"] = arrstrisibaris[1]
+	
+	System.Map["text_home"] = arrstrisibaris[2]
+	System.Map["text_away"] = arrstrisibaris[3]
+	
+	
+	'home
+	
+	for num = 1 to 11 
+
+		if System.Map["text_home"] == "WHITE" then
+			SendCommand("RENDERER*TREE*$T1_"& num &"_NO*MATERIAL*COLOR SET 255.0 255.0 255.0")
+		elseif System.Map["text_home"] == "BLACK" then
+			SendCommand("RENDERER*TREE*$T1_"& num &"_NO*MATERIAL*COLOR SET 0.0 0.0 0.0")
+		end if
+		
+		
+		
+		if System.Map["text_away"] == "WHITE" then
+			SendCommand("RENDERER*TREE*$T2_"& num &"_NO*MATERIAL*COLOR SET 255.0 255.0 255.0")
+		elseif System.Map["text_away"] == "BLACK" then
+			SendCommand("RENDERER*TREE*$T2_"& num &"_NO*MATERIAL*COLOR SET 0.0 0.0 0.0")
+		end if
+	
+	next
+	
+
+	
+	
+	
+	
+end sub
+

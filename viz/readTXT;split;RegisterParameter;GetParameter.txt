@@ -1,0 +1,195 @@
+dim arrRowAllSOCMED as array[string]
+dim aa,bb,cc,dd as array[string]
+dim strRowAllSOCMED,strRowAA as array[string]
+dim fileAllSOCMED as string
+dim strDataAllSOCMED as string
+dim strDataBarisSOCMED as string
+dim  AllSOCMEDcounter as integer
+dim b,status1,y as integer
+
+sub OnLButtonDown()
+'y = y+1
+'println "dedy"
+bacaData()
+end sub
+'
+'sub OnLButtonUp()
+''y = 0
+''println y
+''GetAllSOCMED()
+'end sub
+
+
+
+
+
+sub OnInitParameters()
+	
+	RegisterParameterString("_windowspath", "Windows Path", "\\\\192.168.101.241\\multimedia$\\DATA\\tranding topik\\7. twitter\\", 60,100, "")
+	RegisterParameterString("AllSOCMED", "Data Social Media", "tranding_topik_twitter.txt", 40,100, "")
+
+end sub
+
+
+'baca data sosmed
+sub bacaData()
+
+	dim i as integer
+
+		'tentukan lokasi file text
+		fileAllSOCMED = GetParameterString("_windowspath") & GetParameterString("AllSOCMED")
+
+		'ambil isi file text
+		System.LoadTextFile(fileAllSOCMED, strDataAllSOCMED)
+
+		strDataAllSOCMED.split(Chr(10), arrRowAllSOCMED)
+		
+		for i = 0 to arrRowAllSOCMED.ubound -1 
+		arrRowAllSOCMED[i].split(";", strRowAllSOCMED) 
+		isiNama(strRowAllSOCMED[0], strRowAllSOCMED[1])
+		'isiAbout(strRowAllSOCMED[0], strRowAllSOCMED[1])
+		isiPost(strRowAllSOCMED[0], strRowAllSOCMED[1])
+		isiImage(strRowAllSOCMED[0], strRowAllSOCMED[1])
+
+		
+		'println strRowAllSOCMED[0]
+	next
+
+
+end sub
+
+
+Sub isiNama(katakunci as string, isi as string)
+	if katakunci.Find("nama") >= 0 then
+		
+		Scene.FindContainer(katakunci).Geometry.Text = isi
+		
+	end if
+	
+	if katakunci.Find("account") >= 0 then
+		
+		Scene.FindContainer(katakunci).Geometry.Text = isi
+		
+	end if
+	
+end sub
+
+Sub isiAbout(katakunci as string, isi as string)
+	if katakunci.Find("about") >= 0 then
+		
+		Scene.FindContainer("KONTEN-ABOUT").Geometry.Text = isi
+
+	else
+		
+	end if
+end sub
+
+Sub isiPost(katakunci as string, isi as string)
+	if katakunci.Find("tweets") >= 0 then
+		
+		Scene.FindContainer(katakunci).Geometry.Text = isi
+		
+		println isi
+
+	else
+		
+	end if
+end sub
+
+Sub isiImage(katakunci as string, isi as string)
+	if katakunci.Find("path_image1") >= 0 then
+
+		SendCommand("RENDERER*TREE*$PROFILE-PICTURE*FUNCTION*ControlImage*input SET " & isi)
+		'SendCommand("RENDERER*TREE*$COVER-PHOTO*FUNCTION*ControlImage*input SET " & isi)
+			
+
+	elseif katakunci.Find("path_image2") >= 0 then
+
+		'SendCommand("RENDERER*TREE*$PROFILE-PICTURE*FUNCTION*ControlImage*input SET " & isi)
+		SendCommand("RENDERER*TREE*$COVER-PHOTO*FUNCTION*ControlImage*input SET " & isi)
+			
+
+	else
+		
+	end if
+end sub
+
+
+
+
+
+''untuk isi text ke 2
+'sub GetAllSOCMED()
+'			
+'				bacadata()
+'				aa.clear
+'				bb.clear
+'				cc.clear
+'				dd.clear
+'
+'				'ini array baru
+'				println arrRowAllSOCMED.ubound - 2
+'
+'				for i = 0 to arrRowAllSOCMED.ubound - 2 
+'								
+'				arrRowAllSOCMED[i].split(";",strRowAllSOCMED)
+'				strRowAllSOCMED[2].Replace(0,2,"" ) 
+'
+'				if strRowAllSOCMED[0] = "[F]" then
+'				
+'				b++
+'				
+'				
+'				'println strRowAllSOCMED[1]
+'				aa.push(strRowAllSOCMED[1])
+'				bb.push(strRowAllSOCMED[2])
+'				
+'				end if
+'				
+'				if strRowAllSOCMED[0] = "[T]" then
+'				
+'				b++
+'				
+'				
+'				'println strRowAllSOCMED[1]
+'				cc.push(strRowAllSOCMED[1])
+'				dd.push(strRowAllSOCMED[2])
+'				
+'				
+'				
+'				end if
+'
+'				next
+'
+'				'println aa.ubound
+'				
+'				
+'				for b = 0 to aa.ubound
+'				
+'				println aa[b]
+'				println bb[b]
+'				
+'				scene.findcontainer("NAMA_KOMENTAR_TWITTER"& b ).Geometry.text = aa[b]
+'				scene.findcontainer("KOMENTAR_TWITTER"& b ).Geometry.text = bb[b]
+'				
+'				
+'				
+'				next
+'				
+'				for b = 0 to cc.ubound
+'				
+'				println cc[b]
+'				println dd[b]
+'				
+'				scene.findcontainer("NAMA_KOMENTAR_FACEBOOK"& b ).Geometry.text = cc[b]
+'				scene.findcontainer("KOMENTAR_FACEBOOK"& b ).Geometry.text = dd[b]
+'				
+'				
+'				
+'				next
+'				
+'				
+'				println aa.ubound
+'				println cc.ubound
+'end sub
+

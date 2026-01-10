@@ -1,0 +1,189 @@
+dim lokasifile, strlokasifile, cmd,path,isijudul,isijudul1,isijudul2,isijudul3 as string
+dim arrstrlokasifile, arrstrisibaris as Array[String] 
+dim totalbaris as integer
+dim x as string
+sub OnInitParameters()
+	RegisterFileSelector("LokasiText", "LokasiText", "\\\\192.168.101.241\\daily\\COMWALL-IMAGE SLIDERKU-VIA FILE\\PILKADA2015", "PILKADA_2 TOKOH_REV.txt", "*.txt")
+end sub
+
+sub Isi()
+
+	'##AMBIL ALAMAT FILE DARI GEOMETRY TEXT
+	path =  Scene.FindContainer("PATH").Geometry.Text
+	
+
+	'ambil isi file text
+	'lokasifile = GetParameterString("LokasiText")
+	System.LoadTextFile(path, strlokasifile)
+	
+	strlokasifile.split(Chr(10), arrstrlokasifile)
+	
+	for i = 0 to arrstrlokasifile.ubound 
+		arrstrlokasifile[i].split(";", arrstrisibaris) 
+		SetImage(arrstrisibaris[0], arrstrisibaris[1])
+		CekNilai2(arrstrisibaris[0], arrstrisibaris[1])
+				
+	next
+	
+end sub
+
+Sub SetImage(katakunci as string, nilai as string)
+	'### MEMASUKAN DATA BERDASARKAN KATA KUNCI 
+	for i = 1 to 2
+	
+	if katakunci = "path_image"&i then
+		cmd = "RENDERER*TREE*$FOTO_"& i &"*FUNCTION*ControlImage*input SET " & nilai
+		SendCommand(cmd)
+	end if
+	
+	next
+end sub
+
+Sub CekNilai2(katakunci as string, nilai as string)
+
+	if katakunci.Find("judul") >= 0 then
+		Scene.FindContainer(katakunci).Geometry.Text = nilai
+	end if
+	
+	for i = 1 to 7
+	
+	if katakunci = "judul_field"&i then
+	   
+	    'isijudul1 = Scene.FindContainer(katakunci).Geometry.Text
+	   ' cek(katakunci,nilai)	
+'	   if nilai.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & "judul_field"&i &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & "judul_field"&i &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+
+		cmd = "RENDERER*TREE*$judul_field"& i &"*FUNCTION*ControlText*input SET " & nilai
+		SendCommand(cmd)
+		
+		if nilai.length < 3 then
+			'println "isi >> " & katakunci
+			cmd = "RENDERER*TREE*$" & "judul_field"&i &"*ACTIVE SET FALSE" 
+			SendCommand(cmd)
+		else
+			cmd = "RENDERER*TREE*$" & "judul_field"&i &"*ACTIVE SET TRUE" 
+			SendCommand(cmd)
+		end if	
+
+	end if
+	if katakunci = "isi_field_a"&i then
+	
+'	if nilai.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & "isi_field_a"&i &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & "isi_field_a"&i &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+
+		cmd = "RENDERER*TREE*$isi_field_a"& i &"*FUNCTION*ControlText*input SET " & nilai
+		SendCommand(cmd)
+		
+		if nilai.length < 3 then
+			'println "isi >> " & katakunci
+			cmd = "RENDERER*TREE*$" & "isi_field_a"&i &"*ACTIVE SET FALSE" 
+			SendCommand(cmd)
+		else
+			cmd = "RENDERER*TREE*$" & "isi_field_a"&i &"*ACTIVE SET TRUE" 
+			SendCommand(cmd)
+		end if	
+		
+		
+	end if
+	if katakunci = "isi_field_b"&i then
+	
+'		isijudul3 = Scene.FindContainer(katakunci).Geometry.Text
+'		 cek3(katakunci,nilai)	
+
+'if nilai.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & "isi_field_b"&i &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & "isi_field_b"&i &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+		cmd = "RENDERER*TREE*$isi_field_b"& i &"*FUNCTION*ControlText*input SET " & nilai
+		SendCommand(cmd)
+		
+		if nilai.length < 3 then
+			'println "isi >> " & katakunci
+			cmd = "RENDERER*TREE*$" & "isi_field_b"&i &"*ACTIVE SET FALSE" 
+			SendCommand(cmd)
+		else
+			cmd = "RENDERER*TREE*$" & "isi_field_b"&i &"*ACTIVE SET TRUE" 
+			SendCommand(cmd)
+		end if	
+		 
+	end if
+	if katakunci = "nama"&i then
+		cmd = "RENDERER*TREE*$nama"& i &"*FUNCTION*ControlText*input SET " & nilai
+		SendCommand(cmd)
+	end if
+
+
+	
+	next
+	
+end sub
+
+sub OnLButtonDown()
+	Isi()
+end sub
+
+'sub cek(katakunci as string, nilai as string)
+''
+''for i = 1 to 3
+'  if isijudul1.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+''		
+''next
+'end sub
+'
+'sub cek2(katakunci as string, nilai as string)
+''
+''for i = 1 to 3
+'  if isijudul2.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+''		
+''next
+'end sub
+'
+'sub cek3(katakunci as string, nilai as string)
+''
+''for i = 1 to 3
+'  if isijudul3.length < 3 then
+'			'println "isi >> " & katakunci
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET FALSE" 
+'			SendCommand(cmd)
+'		else
+'			cmd = "RENDERER*TREE*$" & katakunci &"*ACTIVE SET TRUE" 
+'			SendCommand(cmd)
+'		end if
+''		
+''next
+'end sub
+
+sub OnLButtonUp()
+end sub
+

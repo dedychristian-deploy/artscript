@@ -1,0 +1,597 @@
+Structure Newsticker
+    category As string
+    newscontent As string
+End Structure
+
+dim arrCol as array[string]
+dim Newsticker_data as array[Newsticker] 
+dim tmp as Newsticker
+dim counter as integer 
+dim isImage as string
+
+dim DelayInc , DelayInc2 as integer
+dim ib_delay, ib_delay2 as boolean
+dim WhatToDelay as integer
+
+
+dim locFile As Array[String]
+dim SelectedlocFile As Integer
+locFile.Push("  WEB GRAPHIC " )
+locFile.Push("  WINDOWS PATH  ")	
+
+
+'untuk menampung alamat file text newstickernya berada
+dim file as string
+'untuk menampung isi dari file text yang telah di split
+dim strData as string
+'untuk memasukkan isi file kedalam array yg pertama, diaaray ini masih ada baris yang kosong
+dim arrRow as array[string]
+'untuk memasukkan isi file kedalam array yg kedua, array ini digunakan untuk menghidari baris yang kosong
+dim arrRow2 as array[string]
+'untuk digunakan sebagai backup newsticker, bila server grafik mati maka baca dari array yg sumbedrnya dari array Row 2
+dim arrRow_BackupNewsticker as array[string]
+
+'---------------------
+'jumlah index berita dari arrRow2
+dim IndexJumlahBerita_li as integer
+'menandakan untuk kelompok satu (1) atau kelompok dua (2) yg sedang berjalan, (0) tidak sedang berjalan
+dim pos_li as integer = 0
+'perpindahan index untuk membaca berita di dalam arrRow2
+dim counter_li as integer = 0
+'tanda bahwa iklan sedang naik
+dim StatusIklan as boolean = false
+'menandakan bahwa iklan akan ditampilkan
+dim AktifkanIklan_lb as boolean = false
+'menampun sintx eksternal
+dim cmd_ls as string
+'baris kelompok yang berisi berita terakhir
+dim	BarisKelompokAkhir_ls as string
+'untuk memeriksa kelompok mana yang terakhir berisi berita
+'bila kelompok 2 yang berisi berita terakhir, maka selanjutnya akan menampilkan kelompk berita yang pertama
+dim BarisKelompokAkhirPassing_ls as string
+'---------------------
+	
+sub cleartext(cont_name1 as string , cont_name2 as string)
+	scene.findcontainer(cont_name1).geometry.text = ""
+	scene.findcontainer(cont_name2).geometry.text = ""
+end sub
+
+sub OnInitParameters()  
+	RegisterRadioButton("_locFile", "Get Data From ", 0, locFile )		
+	RegisterParameterString("_webdomain", "Domain Name", "192.168.16.160", 20,100, "")
+	RegisterParameterString("_webpath", "Path File", "onair_files/newsticker.txt", 40,100, "")
+	
+	RegisterParameterString("_getfile", "File Location", "d:\\suaraanda_socialnetwork.txt", 40,100, "")
+	RegisterParameterString("_directorNewsticker", "NewsTicker Director", "TICKER", 50,100, "")
+	'RegisterParameterString("_directorInfo", "Info Director", "TICKER", 50,100, "")
+
+	'inputan untuk batas akhir dari sebelah kanan terhadap ekor kelompok satu, bila tidak ada iklan 
+	RegisterParameterDouble("reg_rightlimit_kelompok1" , "Right Limit Kelompok 1", 1.7 , 0 , 1000 )
+	'inputan untuk batas akhir dari sebelah kanan terhadap ekor kelompok dua, bila tidak ada iklan 
+	RegisterParameterDouble("reg_rightlimit_kelompok2" , "Right Limit Kelompok 2", 1.7 , 0 , 1000 )
+		
+end sub
+
+sub OnParameterChanged( parameterName As String)
+	
+	if parameterName = "_locFile" then 
+		SelectedlocFile = GetParameterInt(parameterName)
+		if  SelectedlocFile	= 0 then
+			SendGuiParameterShow("_webdomain" , 1)
+			SendGuiParameterShow("_webpath" , 1)
+			SendGuiParameterShow("_getfile" , 0)
+		elseif  SelectedlocFile	= 1 then
+			SendGuiParameterShow("_webdomain" , 0)
+			SendGuiParameterShow("_webpath" , 0)
+			SendGuiParameterShow("_getfile" , 1)
+		end if
+		
+	end if
+end sub
+
+sub SetCurrentConter( ai_counter as integer)
+	counter = ai_counter
+End Sub
+
+Sub ClearData()
+	Newsticker_data.clear()
+	counter = 0
+End Sub
+
+sub OnInit()
+	'ClearData()
+	'GetDataFile()
+end sub
+
+
+sub UrgentSend()
+	scene.findcontainer("$#SCRIPT-NEWSTICKER#$ScriptNewsticker").script.cleartext ("ISI_KONTEN_NEWSTICKER1","ISI_KONTEN_NEWSTICKER2")
+	scene.findcontainer("$#SCRIPT-NEWSTICKER#$ScriptNewsticker").script.cleartext ("ISI_KONTEN_NEWSTICKER3","ISI_KONTEN_NEWSTICKER4")
+	ClearData()
+	GetDataFile()
+end sub
+
+sub GetDataFile()
+		
+	if arrRow.ubound = -1 then exit sub 
+	
+	Newsticker_data.clear()	
+	counter = 0
+	
+	for i = 1 to arrRow.ubound 
+		
+		if len(arrRow[i]) > 0 then 			  
+			tmp.newscontent =  arrRow[i]			
+			Newsticker_data.push(tmp)	
+		end if 
+		
+	next
+end sub
+
+sub OnExecPerField()
+	dim EndPointKelompok1_lc as container =  Scene.FindContainer("END_POINT_KELOMPOK1")
+	dim EndPointKelompok2_lc as container =  Scene.FindContainer("END_POINT_KELOMPOK2")
+	dim EndPointIklan_lc as container =  Scene.FindContainer("END_POINT_IKLAN")
+
+	dim   as container =  Scene.FindContainer("BatasKanan")
+	dim bataskiri_lc as container =  Scene.FindContainer("BatasKiri")
+		
+	dim Kelompok1_lc as container =  Scene.FindContainer("KELOMPOK1")
+	dim Kelompok2_lc as container =  Scene.FindContainer("KELOMPOK2")
+	dim Iklan_lc as container =  Scene.FindContainer("IKLAN")
+	
+	
+	''''' BLOK SAAT IKLAN TIDAK DIPANGGIL ''''''''''
+	'bila posisi selisih ekor kelompok 1 dengan batas kanan lebih kecil dari inputan batas kanan kelompok satu dan kondisi kelompok 1 tidak sedang berjalan dan iklan tidak dimainkan
+	''hati-hati sintak ini bisa menjalankan baris perintahnya lebih dari sekali karena nilai lebih kecilnya bisa dijalankan dua kali
+	if  distance(bataskanan_lc.position.xyz, EndPointKelompok1_lc.position.xyz) < GetParameterDouble("reg_rightlimit_kelompok1") and pos_li = 0 and StatusIklan = false then	
+		Kelompok2_lc.Script.p_pause()
+		Kelompok2_lc.Script.p_reset(true)
+		Kelompok2_lc.Script.p_start()
+		'''''println "Pindah Kelompok2"
+		'menandakan bahwa kelompok 2 sedang berjalan
+		pos_li = 2
+		''''println distance(bataskanan_lc.position.xyz, EndPointKelompok1_lc.position.xyz)
+	elseif  distance(bataskanan_lc.position.xyz, EndPointKelompok2_lc.position.xyz) < GetParameterDouble("reg_rightlimit_kelompok2") and pos_li = 0 and StatusIklan = false then	
+		Kelompok1_lc.Script.p_pause()
+		Kelompok1_lc.Script.p_reset(true)
+		Kelompok1_lc.Script.p_start()
+		'''''println "Pindah Kelompok1"
+		'menandakan bahwa kelompok 1 sedang berjalan
+		pos_li = 1
+		'''println distance(bataskanan_lc.position.xyz, EndPointKelompok2_lc.position.xyz)
+		
+	'bila selisih batas kiri dg ekor kelompok 1 sudah lebih kecil dari batas kiri kelompok 1 dg iklan dan status kelompok ini tidak sedang berjalan dan iklan dijalankan dan kelompok berisi berita terakhir adalah kelompok 1 maka
+	elseif  distance(bataskiri_lc.position.xyz, EndPointKelompok1_lc.position.xyz) < GetParameterDouble("reg_leftlimit_kelompok1_Iklan") and pos_li = 0 and StatusIklan = True and BarisKelompokAkhir_ls = "Kelompok1" then	
+		'taruh kelompok dua di paling kanan layar monitor
+		Kelompok2_lc.Script.p_pause()
+		Kelompok2_lc.Script.p_reset(true)
+		'panggil director iklan
+		cmd_ls = "RENDERER*STAGE*DIRECTOR*IKLAN CONTINUE"
+		SendCommand(cmd_ls)
+		'''''println "Jalankan iklan setelah kelompok satu"
+		
+		'pindahkan isi variabel ke variabel temp nantinya untu diperiksa
+		BarisKelompokAkhirPassing_ls = BarisKelompokAkhir_ls
+		'reset variabel aslinya
+		BarisKelompokAkhir_ls = "Null"
+
+	'bila selisih batas kiri dg ekor kelompok 2 sudah lebih kecil dari batas kiri kelompok 2 dg iklan dan status kelompok ini tidak sedang berjalan dan iklan dijalankan dan kelompok berisi berita terakhir adalah kelompok 2 maka
+	elseif distance(bataskiri_lc.position.xyz, EndPointKelompok2_lc.position.xyz) < GetParameterDouble("reg_leftlimit_kelompok2_Iklan") and pos_li = 0 and StatusIklan = True and BarisKelompokAkhir_ls = "Kelompok2" then	
+		'taruh kelompok satu di paling kanan monior
+		Kelompok1_lc.Script.p_pause()
+		Kelompok1_lc.Script.p_reset(true)
+		'panggil director iklan
+		cmd_ls = "RENDERER*STAGE*DIRECTOR*IKLAN CONTINUE"
+		SendCommand(cmd_ls)
+		'''''println "Jalankan iklan setelah kelompok satu"
+
+		'pindahkan isi variabel ke variabel temp nantinya untu diperiksa
+		BarisKelompokAkhirPassing_ls = BarisKelompokAkhir_ls
+		'reset variabel aslinya
+		BarisKelompokAkhir_ls = "Null"
+	end if
+
+	'bila kelompok 1 sedang dijalankan
+	if pos_li = 1 then
+		'reset kembali status jalannya
+		pos_li = 0
+
+		'nyalakan kontainer, hal ini terjadi karena saat ada iklan tadi, berita terakhir ada di baris pertama, jadi yang baris kedua dan burung baris pertama dimatikan
+		'dan dinyalakin kembali bila tidak ada iklan lagi, untuk jaga-jaga
+		scene.findcontainer("WITH_IMG1").Active = true
+		scene.findcontainer("NEWSTICKER2").Active = true
+		
+		''''' BLOK UNTUK ISI BERITA ''''''''''
+		'isi berita baris ke satu
+		'bila counter sudah mencapai nilai maksimal
+		if counter_li >= IndexJumlahBerita_li then
+			'reset kembali kounternya
+			counter_li = 0
+			'ambil lagi data yg baru
+			GetBeritaNews()
+		else
+			'lakukan penambahan counter, ambil data selanjutnya
+			counter_li = counter_li + 1
+		end if
+
+		println "isis berita baris satu"		
+		println "arrRow2[ " & counter_li & " ] -> " & arrRow2[counter_li]
+		'isi berita berita baris pertama
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER1").geometry.text = arrRow2[counter_li] 
+
+
+
+		''''' BLOK UNUTK SETTING IKLAN DAN MATIKAN BARIS SELANJUTNYA SAAT BERITA AKHIR '''''''''''
+		'jika sudah sampai pada berita yang terakhir maka container setelahnya hilang
+		if (counter_li >= IndexJumlahBerita_li or counter_li = 0) and AktifkanIklan_lb = true then
+			'set jalankan iklan
+			StatusIklan = True
+			'baris terakhir yg mengandung berita adalah kelompok 1
+			BarisKelompokAkhir_ls = "Kelompok1"
+
+			'matikan burung baris pertama dan berita baris 2
+			scene.findcontainer("WITH_IMG1").Active = false
+			scene.findcontainer("NEWSTICKER2").Active = false
+			exit sub
+		end if
+		'''''println "StatusIklan -> " & StatusIklan
+'		
+		
+		
+
+		''''' BLOK UNTUK ISI BERITA ''''''''''
+		'isi berita baris ke dua
+		'bila sudah mencapai nilai maksimal
+		if counter_li >= IndexJumlahBerita_li then
+			'reset kembali menjadi nol
+			counter_li = 0
+			'reload data dari file text
+			GetBeritaNews()
+		else
+			'lakukan counter
+			counter_li = counter_li + 1
+		end if
+		
+		println "isis berita baris dua"
+		println "arrRow2[ " & counter_li & " ] -> " & arrRow2[counter_li]
+		'isi berita
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER2").geometry.text = arrRow2[counter_li] 
+
+
+		''''' BLOK UNUTK SETTING IKLAN DAN MATIKAN BARIS SELANJUTNYA SAAT BERITA AKHIR '''''''''''
+		'jika sudah sampai baris terakhir pada berita yang terakhir maka gambarnya hilang
+		if (counter_li >= IndexJumlahBerita_li or counter_li = 0) and AktifkanIklan_lb = true then
+			'set iklan dijalankan
+			StatusIklan = True
+			'kelompok terakhir yg berisi berita adalah kelompok 1
+			BarisKelompokAkhir_ls = "Kelompok1"
+			'matikan gambar burung karena saat ini adalah berita yg terakhir
+			scene.findcontainer("WITH_IMG2").Active = false
+		else
+			'masih menyalakan gambar burung karena saat ini bukanlah berita yg terakhir
+			scene.findcontainer("WITH_IMG2").Active = true
+		end if
+		'''''println "StatusIklan -> " & StatusIklan
+
+		
+	'bila kelompok 2 sedagn berjalan
+	elseif pos_li = 2 then
+		'kasih tanda bahwa kelompok dua sudah dinetralkan kembali
+		pos_li = 0
+
+		'nyalakan kontainer, hal ini terjadi karena saat ada iklan tadi, berita terakhir ada di baris pertama, jadi yang baris kedua dan burung baris pertama dimatikan
+		'dan dinyalakin kembali bila tidak ada iklan lagi, untuk jaga-jaga
+		scene.findcontainer("WITH_IMG3").Active = true
+		scene.findcontainer("NEWSTICKER4").Active = true
+
+		'''''' BLOK UNTUK ISI BERITA ''''''''''''
+		'isi berita baris ke tiga
+		'bila baris berita sudah mencapai urutan akhir
+		if counter_li >= IndexJumlahBerita_li then
+			'pilih berita mulai dari awal
+			counter_li = 0
+			'ambil data baru dari file text
+			GetBeritaNews()
+		'bila urutan berita masih belum mencapai akhir, ditambah satu lagi
+		else
+			counter_li = counter_li + 1
+		end if
+
+		println "isis berita baris tiga"
+		println "arrRow2[ " & counter_li & " ] -> " & arrRow2[counter_li]
+		'isi baris pertama pada kelompok dua dengan isi beritanya
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER3").geometry.text = arrRow2[counter_li] 
+
+
+
+		'''''' BLOK UNTUK MENENTUKAN JALANNYA IKLAN DAN MEMATIKAN BARIS YG TIDAK DIGUNAKAN ''''''''''''
+		'jika sudah sampai pada berita yang terakhir dan iklan ditampilkan maka container setelahnya hilang
+		if (counter_li >= IndexJumlahBerita_li or counter_li = 0) and AktifkanIklan_lb = true then
+			'iklan akan muncul
+			StatusIklan = True
+			'bahwa berita terakhir ada di kelompok dua baris pertama, sehingga gambar burung dan baris keduanya hilang
+			BarisKelompokAkhir_ls = "Kelompok2"
+			scene.findcontainer("WITH_IMG3").Active = false
+			scene.findcontainer("NEWSTICKER4").Active = false
+			exit sub
+		end if
+		'''''println "StatusIklan -> " & StatusIklan
+		
+
+
+		'''''' BLOK UNTUK ISI BERITA ''''''''''''
+		'isi berita baris ke empat
+		'bila jumlah berita sudah mencapai maksimal
+		if counter_li >= IndexJumlahBerita_li then
+			'reset kembali menjadi nol dan ambil data baru kembali
+			counter_li = 0
+			GetBeritaNews()
+		'saat belum mencapai maksimal, tambahkan dengan satu
+		else
+			counter_li = counter_li + 1
+		end if
+		
+		println "isis berita baris empat"
+		println "arrRow2[ " & counter_li & " ] -> " & arrRow2[counter_li]
+		'isi baris kedua dengan isi berita dari variabel array yang kedua
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER4").geometry.text = arrRow2[counter_li]
+
+		'''''println "counter_li -> " & counter_li & " ---- " & "Index JumlahBerita_li -> " & IndexJumlahBerita_li
+		
+		
+		'''''' BLOK UNTUK MENENTUKAN JALANNYA IKLAN DAN MEMATIKAN BARIS YG TIDAK DIGUNAKAN ''''''''''''
+		'jika sudah sampai baris terakhir pada berita yang terakhir dan iklan ditampilkan maka gambarnya hilang
+		if (counter_li >= IndexJumlahBerita_li or counter_li = 0) and AktifkanIklan_lb = true then
+			'iklan akan dimunculkan
+			StatusIklan = True
+			'setting kelompok terakhir yg memiliki berita adalah kelompok 2
+			BarisKelompokAkhir_ls = "Kelompok2"
+			'gambar hilang karena sudah ada di berita yg terakhir
+			scene.findcontainer("WITH_IMG4").Active = false
+		else
+			'gambar masih ada karena belum di berita yg terakhir
+			scene.findcontainer("WITH_IMG4").Active = true
+		end if
+		'''''println "StatusIklan -> " & StatusIklan
+		
+	end if
+	
+	'println "AktifkanIklan_lb -> " & AktifkanIklan_lb
+	'println "StatusIklan -> " & StatusIklan	
+end sub
+
+sub GetBeritaNews()	
+	dim i as integer
+	dim CountArrRow_li as integer
+	
+	if SelectedlocFile = 0 then
+		strData = system.TcpSend( GetParameterString( "_webdomain" )  ,80, "GET "& "/" & GetParameterString( "_webpath" ) &"\n\n", 900) 
+		strData.split( Chr(10), arrRow)	
+	else
+		file = GetParameterString("_getfile")
+		if System.LoadTextFile(file, strData) then
+			'println "Get a new data from " & file 
+			scene.findcontainer("result_newsticker").geometry.text = "Get a new data from " & file 
+			strData.split(Chr(10),arrRow) 
+		else
+			'println file & " not found!"
+			scene.findcontainer("result_newsticker").geometry.text = file & " not found!"
+		end if
+	end if
+	
+	
+	'saat strdata tidak berisi data
+	'bila tidak bisa mengambil newstixker.txt dari server graphic
+	println "isi strdata -----------> " & strdata
+	if strData = "" or strdata.Find("<?xml version=") >= 0 or strdata.Find("Object not found") > 0 then	
+		'println "-------- Server Graphic Mati --------"		
+		'bila arrRow_BackupNewsticker telah kosong dan array arrRow2 ini juga kosong
+		if arrRow2.ubound < 1 and arrRow_BackupNewsticker.ubound < 1 then
+			'println "-------- arrRow_BackupNewsticker Kosong dan arrRow2 Kosong --------"		
+			file = "D:\\newsticker\\newsticker.txt"
+			if System.LoadTextFile(file, strData) then
+				'println "-------- Ambil D:\\Newsticker\\Newsticker.txt --------"		
+				strData.split(Chr(10),arrRow)
+				
+				for i = 1 to arrRow.ubound 
+					'jika ditemukan baris indek yg isinya tidak kosong maka masukkan isinya ke array yg kedua
+					if len(arrRow[i]) > 2 then 
+						arrRow2.push(arrRow[i])
+					end if			
+				next
+							
+				'memasukkan array arrRow2 ke array backup newsticker, bila server graphic mati
+				if arrRow2.ubound > 1 then
+				'println "-------- Masuukan arrRow_BackupNewsticker dari arrRow2, Server Mati --------"		 
+					arrRow_BackupNewsticker.clear
+					for i = 0 to arrRow2.ubound 
+						if len(arrRow[i]) > 2 then 
+							arrRow_BackupNewsticker.push(arrRow2[i])
+						end if			
+					next
+				end if
+		
+				'ambil banyaknya indeks dari array yg kedua
+				IndexJumlahBerita_li = arrRow_BackupNewsticker.ubound 
+			
+			elseif strData = "" then
+				'masukkan ke array saat tidak ada data
+				'println "-------- Newsticker.txt Lokal dan Server Mati --------"		
+
+				for i = 0 to 5
+					arrRow2.push("www.metrotvnews.com www.metrotvnews.com www.metrotvnews.com www.metrotvnews.com")			
+				next
+
+				'ambil banyaknya indeks dari array yg kedua
+				IndexJumlahBerita_li = arrRow2.ubound 
+								
+			end if
+			
+		'bila arrRow_BackupNewsticker masih ada dan array arrRow2 ini telah kosong
+		elseif arrRow2.ubound < 1 and arrRow_BackupNewsticker.ubound > 1 then			
+			'println "-------- arrRow_BackupNewsticker Isi dan arrRow2 Kosong --------"		
+
+			'bersihkan array yg kedua sebelum dimasukkan datanya
+			arrRow2.Clear
+					
+			'lakukan looping sebanyak index dari array yg pertama
+			'println "-------- Isi arrRow2 dari arrRow_BackupNewsticker, Server Mati --------"		
+
+			for i = 0 to arrRow_BackupNewsticker.ubound 
+				'jika ditemukan baris indek yg isinya tidak kosong maka masukkan isinya ke array yg kedua
+				if len(arrRow_BackupNewsticker[i]) > 2 then 
+					arrRow2.push(arrRow_BackupNewsticker[i])
+				end if			
+			next
+		
+			'ambil banyaknya indeks dari array yg kedua
+			IndexJumlahBerita_li = arrRow_BackupNewsticker.ubound 
+		
+		'bila arrRow_BackupNewsticker dan arrRow2 masih ada
+		elseif arrRow2.ubound > 1 and arrRow_BackupNewsticker.ubound > 1 then	
+		end if
+		
+	
+	'bila normal semuanya, data bisa dibaca
+	elseif strData <> "" or strdata.Find("<?xml version=") >= 0 or strdata.Find("Object not found") > 0 then	
+	'println "---------------- Semuanya Normal -------------"
+		'memasukkan array arrRow2 ke array backup newsticker, bila server graphic mati
+		if arrRow2.ubound > 1 then 
+			'println "-------- Isi arrRow_BackupNewsticker dari arrRow2 Server Nyala --------"	
+			arrRow_BackupNewsticker.Clear
+			for i = 0 to arrRow2.ubound 
+				if len(arrRow2[i]) > 2 then 
+					arrRow_BackupNewsticker.push(arrRow2[i])
+				end if			
+			next
+		end if
+		
+		''''BLOK UNTUK MEMINDAHKAN ISI KE ARRAY PERTAMA KE ARRAY KEDUA '''''''''
+		'bersihkan array yg kedua sebelum dimasukkan datanya
+		arrRow2.Clear
+	
+		'lakukan looping sebanyak index dari array yg pertama
+		for i = 1 to arrRow.ubound 
+			'jika ditemukan baris indek yg isinya tidak kosong maka masukkan isinya ke array yg kedua
+			if len(arrRow[i]) > 2 then 
+				arrRow2.push(arrRow[i])
+			end if			
+		next
+	
+		'ambil banyaknya indeks dari array yg kedua
+		IndexJumlahBerita_li = arrRow2.ubound 
+	
+	end if
+	
+'	println "Banyak arrRow.ubound -> " & arrRow.ubound
+'		dim a as integer
+'		'for a = 1 to arrRow.ubound 
+'		'	println a & " --> " & arrRow[a]	
+'		'next
+'	println "*"
+'	println "*"
+'	println "*"
+'	println "Banyak arrRow2.ubound -> " & arrRow2.ubound
+'		dim b as integer
+'		'for b = 0 to arrRow2.ubound 
+'		'	println b & " --> " & arrRow2[b]	
+'		'next
+'	println "*"
+'	println "*"
+'	println "*"
+'	println "Banyak arrRow_BackupNewsticker.ubound -> " & arrRow_BackupNewsticker.ubound 
+'		dim c as integer
+'		'for c = 0 to arrRow_BackupNewsticker.ubound 
+'		'	println c & " --> " & arrRow_BackupNewsticker[c]	
+'		'next
+'	println "*"
+'	println "*"
+'	println "*"
+'	println "--- strData ------------------> " & strData 
+'	println "*"
+'	println "*"
+'	println "*"f
+end sub
+
+Sub ResetStatusIklan()
+	'matikan menjalankan iklan
+	StatusIklan = false
+end sub
+
+sub SetNilaiAktifasiIklan(nilai_plb as boolean)
+	'aktifkan atau mematikan pemanggilan iklan
+	AktifkanIklan_lb = nilai_plb
+end sub
+
+
+'''' BLOK UNTUK MENJALANKAN KELOMPOK BERITA SELANJUTNYA '''''''''''''''	
+sub SetPosisiKelompok()
+	dim Kelompok1_lc as container =  Scene.FindContainer("KELOMPOK1")
+	dim Kelompok2_lc as container =  Scene.FindContainer("KELOMPOK2")
+	'''''println "BarisKelompokAkhirPassing_ls -> " & BarisKelompokAkhirPassing_ls
+	
+	'bila kelompok 2 yg terakhir kali berisi berita
+	if BarisKelompokAkhirPassing_ls = "Kelompok2" then
+	
+		'reset semua menjadi nol
+		counter_li = 0
+		'isi kelompok 1 baris pertama dengan berita 1
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER1").geometry.text = arrRow2[counter_li]
+		counter_li = counter_li + 1 
+		'isi kelompok 1 baris kedua dengan berita 2
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER2").geometry.text = arrRow2[counter_li] 
+		'jalankan kelompok 1
+		Kelompok1_lc.Script.p_pause
+		Kelompok1_lc.Script.p_reset true
+		Kelompok1_lc.Script.p_start		
+
+
+	'bila kelompok 1 yg terakhir kali berisi berita
+	elseif BarisKelompokAkhirPassing_ls = "Kelompok1" then
+	
+		'reset semua menjadi nol
+		counter_li = 0
+		'isi kelompok 2 baris pertama dengan berita 1
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER3").geometry.text = arrRow2[counter_li]
+		counter_li = counter_li + 1 
+		'isi kelompok 2 baris pertama dengan berita 2
+		scene.findcontainer("ISI_KONTEN_NEWSTICKER4").geometry.text = arrRow2[counter_li] 
+		'jalankan kelompok 1
+		Kelompok2_lc.Script.p_pause
+		Kelompok2_lc.Script.p_reset true
+		Kelompok2_lc.Script.p_start		
+	end if
+end sub
+
+'''''' BLOK SAAT NEWSTICKER PERTAMA KALI DIJALANKAN '''''''''''
+Sub RunningKelompok1PertamaKali()
+	dim Kelompok1_lc as container =  Scene.FindContainer("KELOMPOK1")
+	dim Kelompok2_lc as container =  Scene.FindContainer("KELOMPOK2")
+	
+	'reset kelompok 2
+	Kelompok2_lc.Script.p_start		
+	Kelompok2_lc.Script.p_pause
+	Kelompok2_lc.Script.p_reset true
+
+	'isi beritanya
+	counter_li = 0
+	scene.findcontainer("ISI_KONTEN_NEWSTICKER1").geometry.text = arrRow2[counter_li]
+	counter_li = counter_li + 1 
+	scene.findcontainer("ISI_KONTEN_NEWSTICKER2").geometry.text = arrRow2[counter_li] 
+	
+	'jalankan kelompoknya
+	Kelompok1_lc.Script.p_pause
+	Kelompok1_lc.Script.p_reset true
+	Kelompok1_lc.Script.p_start		
+	
+	'nyalakan kembali burung kelompok 1 baris 2 dan burung kelompok 2 baris 2, 
+	'untuk jaga2 karena mungkin masih tidak aktif saat berita terakhir bila ada iklan
+	scene.findcontainer("WITH_IMG2").Active = true
+	scene.findcontainer("WITH_IMG4").Active = true
+end sub
+
+
+
+
+
