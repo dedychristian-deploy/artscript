@@ -1,0 +1,28 @@
+Sub OnInitParameters()
+  RegisterParameterDouble("TIME", "TIME OF KEYFRAME", 0.0, 0.0, 500.0)
+  RegisterPushButton("ADD_STOP", "ADD STOP", 1)
+  RegisterPushButton("DELETE_STOP", "DELETE STOP", 2)
+end sub
+
+sub OnExecAction(buttonId As Integer)
+  if buttonId = 1 then
+    AddStop(GetParameterDouble("TIME"))
+  elseif buttonId = 2 then
+    DeleteStop()
+  end if
+end sub
+
+sub AddStop(time as Double)
+  dim mainDirector as Director = Scene.Stage.RootDirector
+  dim channel as Channel = mainDirector.EventChannel
+  channel.AddKeyframe(time)
+end sub
+
+sub DeleteStop()
+  dim mainDirector as Director = Scene.Stage.RootDirector
+  dim channel as Channel = mainDirector.EventChannel
+
+  dim stopKeyframe as Keyframe = channel.FirstKeyframe
+
+  channel.DeleteKeyframe(stopKeyframe)
+end sub

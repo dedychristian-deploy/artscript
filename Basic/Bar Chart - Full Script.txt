@@ -1,0 +1,296 @@
+sub OnInitParameters()
+    RegisterParameterBool("DEACTIVATE", "DEACTIVATE SCRIPT", false)
+
+    if IsDeactivateButtonClicked() = true then
+        ActivateParameters(true)
+        exit sub
+    end if
+
+    dim rows as Array[String]
+    rows.Push("-- CHOOSE BAR COUNT --") '0
+    rows.Push("1 BAR") '1
+    rows.Push("2 BARS") '2
+    rows.Push("3 BARS") '3
+    rows.Push("4 BARS") '4
+    rows.Push("5 BARS") '5
+
+    RegisterParameterDropDown("BARS_COUNT", "BARS COUNT", 5, rows, 30, 6)
+    RegisterParameterString("LABEL_1", "DOWN LABEL BAR 1", "2018", 50, 100, "")
+    RegisterParameterString("LABEL_2", "DOWN LABEL BAR 2", "2018", 50, 100, "")
+    RegisterParameterString("LABEL_3", "DOWN LABEL BAR 3", "2018", 50, 100, "")
+    RegisterParameterString("LABEL_4", "DOWN LABEL BAR 4", "2018", 50, 100, "")
+    RegisterParameterString("LABEL_5", "DOWN LABEL BAR 5", "2018", 50, 100, "")
+
+    RegisterParameterInt("PRECISION", "PRECISION", 2, 0, 6)
+    RegisterParameterString("DECIMAL_POINT", "SYMBOL FOR DECIMAL POINT", ",", 20, 1, "")
+
+    RegisterParameterDouble("BAR_1", "BAR 1 VALUE", 82.5, 0.0, 1000)
+    RegisterParameterDouble("BAR_2", "BAR 2 VALUE", 82.5, 0.0, 1000)
+    RegisterParameterDouble("BAR_3", "BAR 3 VALUE", 82.5, 0.0, 1000)
+    RegisterParameterDouble("BAR_4", "BAR 4 VALUE", 82.5, 0.0, 1000)
+    RegisterParameterDouble("BAR_5", "BAR 5 VALUE", 82.5, 0.0, 1000)
+
+   ' dim defColor as Color = CColor(255, 255, 255)
+
+   ' For i = 1 to 5
+     '   dim barNumber as String = CStr(i)
+     '   RegisterParameterColor("COLOR_BAR_" & barNumber, "COLOR BAR " & barNumber, defColor)
+  '  next
+
+    RegisterParameterDouble("SCALE_LABELS", "LABELS SCALE", 0.7, 0.0, 10)
+    RegisterParameterDouble("SCALE_ALL_BARS", "SCALE ALL BARS ON Y AXIS", 1, 0.0, 30.0)
+
+    RegisterPushButton("APPLY_CHANGES", "APPLY CHANGES", 1)
+end sub
+
+sub OnExecAction(buttonId As Integer)
+    if buttonId = 1 then
+        if IsDeactivateButtonClicked() = true then
+            ActivateParameters(true)
+            exit sub
+        end if
+
+        SetTextData(GetParameterString("LABEL_1"), "Row_1$DOWN$LABEL_1")
+        SetTextData(GetParameterString("LABEL_2"), "Row_2$DOWN$LABEL_1")
+        SetTextData(GetParameterString("LABEL_3"), "Row_3$DOWN$LABEL_1")
+        SetTextData(GetParameterString("LABEL_4"), "Row_4$DOWN$LABEL_1")
+        SetTextData(GetParameterString("LABEL_5"), "Row_5$DOWN$LABEL_1")
+
+        SetColorByInput(GetParameterString("LABEL_1"), "Row_1$Info$group$BAR_1")
+        SetColorByInput(GetParameterString("LABEL_2"), "Row_2$Info$group$BAR_1")
+        SetColorByInput(GetParameterString("LABEL_3"), "Row_3$Info$group$BAR_1")
+        SetColorByInput(GetParameterString("LABEL_4"), "Row_4$Info$group$BAR_1")
+        SetColorByInput(GetParameterString("LABEL_5"), "Row_5$Info$group$BAR_1")
+    end if
+end sub
+
+sub OnInit()
+      if IsDeactivateButtonClicked() = true then
+            ActivateParameters(true)
+            exit sub
+      end if 
+end sub
+
+sub OnParameterChanged(parameterName As String)
+    ActivateParameters(IsDeactivateButtonClicked())
+    
+    if IsDeactivateButtonClicked() = true then
+        exit sub
+    end if
+
+    if parameterName = "SCALE_LABELS" then
+        For i = 1 to 5
+            dim rowNumber as String = CStr(i)
+            Scale(GetParameterDouble("SCALE_LABELS"), "Row_" & rowNumber & "$DOWN$LABEL_1", "")
+        next
+    elseif parameterName = "DECIMAL_POINT" then
+        For i = 1 to 5
+             dim rowNumber as String = CStr(i)
+             SetDoubleData(GetParameterDouble("BAR_" & rowNumber),"Row_" & rowNumber & "$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+        next
+    elseif parameterName = "PRECISION" then
+        For i = 1 to 5
+            dim rowNumber as String = CStr(i)
+             SetDoubleData(GetParameterDouble("BAR_" & rowNumber),"Row_" & rowNumber & "$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+        next
+    elseif parameterName = "BAR_1" then
+        ChangeKeyframeValue(GetParameterDouble("BAR_1"), "Row_1$Info$group$BAR_1", "BAR")
+        SetDoubleData(GetParameterDouble("BAR_1"),"Row_1$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+    elseif parameterName = "BAR_2" then
+        ChangeKeyframeValue(GetParameterDouble("BAR_2"), "Row_2$Info$group$BAR_1", "BAR")
+        SetDoubleData(GetParameterDouble("BAR_2"),"Row_2$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+    elseif parameterName = "BAR_3" then
+        ChangeKeyframeValue(GetParameterDouble("BAR_3"), "Row_3$Info$group$BAR_1", "BAR")
+        SetDoubleData(GetParameterDouble("BAR_3"),"Row_3$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+    elseif parameterName = "BAR_4" then
+        ChangeKeyframeValue(GetParameterDouble("BAR_4"), "Row_4$Info$group$BAR_1", "BAR")
+       SetDoubleData(GetParameterDouble("BAR_4"),"Row_4$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+    elseif parameterName = "BAR_5" then
+        ChangeKeyframeValue(GetParameterDouble("BAR_5"), "Row_5$Info$group$BAR_1", "BAR")
+        SetDoubleData(GetParameterDouble("BAR_5"),"Row_5$Info$group$UP$Data_1", GetParameterInt("PRECISION"), GetParameterString("DECIMAL_POINT"))
+    elseif parameterName = "SCALE_ALL_BARS" then
+        For i = 1 to 5
+            dim rowNumber as String = CStr(i)
+            Scale(GetParameterDouble("SCALE_ALL_BARS"), "Row_" & rowNumber & "$Info$group$BAR_1", "y")
+        next
+    elseif parameterName = "COLOR_BAR_1" then
+        SetColor(GetParameterColor("COLOR_BAR_1"), "Row_1$Info$group$BAR_1")
+    elseif parameterName = "COLOR_BAR_2" then
+        SetColor(GetParameterColor("COLOR_BAR_2"), "Row_2$Info$group$BAR_1")
+    elseif parameterName = "COLOR_BAR_3" then
+        SetColor(GetParameterColor("COLOR_BAR_3"), "Row_3$Info$group$BAR_1")
+    elseif parameterName = "COLOR_BAR_4" then
+        SetColor(GetParameterColor("COLOR_BAR_4"), "Row_4$Info$group$BAR_1")
+    elseif parameterName = "COLOR_BAR_5" then
+        SetColor(GetParameterColor("COLOR_BAR_5"), "Row_5$Info$group$BAR_1")
+    elseif parameterName = "BARS_COUNT" then
+        ConfigureBars(GetParameterInt("BARS_COUNT"))
+    end if
+end sub
+
+sub SetDoubleData(input as Double, containerName as String, precision as Integer, decimalPoint as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+
+    dim inputAsString as String
+    inputAsString = DoubleToString(input, precision)
+
+    dim indexOfDecimalPoint as Integer = inputAsString.FindFirstOf(".")
+
+    if decimalPoint.Length > 0 then
+        inputAsString.Replace(indexOfDecimalPoint, 1, decimalPoint)
+    end if
+
+    targetContainer.Geometry.Text = inputAsString
+end sub
+
+sub ChangeKeyframeValue(input as Double, containerName as String, keyframeName as String)
+    dim targetContainer as Container
+    targetContainer = Scene.FindContainer(containerName)
+
+    dim targetKeyframe as Keyframe
+    targetKeyframe = targetContainer.FindKeyframeOfObject(keyframeName)
+
+    targetKeyframe.FloatValue = input
+    targetKeyframe.UpdateAnimation()
+end sub
+
+sub Scale(input as Double, containerName as String, axis as String)
+    dim targetContainer as Container
+    targetContainer = Scene.FindContainer(containerName)
+
+    if axis = "x" then
+        targetContainer.Scaling.x = input
+    elseif axis = "y" then
+        targetContainer.Scaling.y = input
+    elseif axis = "z" then
+        targetContainer.Scaling.z = input
+    elseif axis = "" then
+        targetContainer.Scaling.x = input
+        targetContainer.Scaling.y = input
+        targetContainer.Scaling.z = input
+    end if
+end sub
+
+sub SetTextData(input as String, containerName as String)
+    dim targetContainer as Container
+    targetContainer = Scene.FindContainer(containerName)
+
+    input.Trim()
+
+    targetContainer.Geometry.Text = input
+end sub
+
+sub SetColor(inputColor as Color, containerName as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+    targetContainer.Material.Color = inputColor
+    targetContainer.Update()
+end sub
+
+sub SetColorByInput(input as String, containerName as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+
+    dim whiteColor as Color
+    whiteColor.SetRGB8(255, 255, 255)
+
+    dim redColor as Color
+    redColor.SetRGB8(255, 77, 97)
+
+    dim blueColor as Color
+    blueColor.SetRGB8(50, 80, 255)
+
+    dim greenColor as Color
+    greenColor.SetRGB8(87, 198, 100)
+
+    dim yellowColor as Color
+    yellowColor.SetRGB8(221, 198, 79)
+    
+    input.Trim()
+    input.MakeLower()
+
+    if input = "germany" then
+        targetContainer.Material.Color = redColor
+    elseif input = "italy" then
+        targetContainer.Material.Color = greenColor
+    elseif input = "bulgaria" then
+        targetContainer.Material.Color = whiteColor
+    elseif input = "france" then
+        targetContainer.Material.Color = blueColor
+    elseif input = "sweden" then
+        targetContainer.Material.Color = yellowColor
+    end if
+
+    targetContainer.Update()
+end sub
+
+sub ConfigureBars(rowsCount as Integer)
+    ShowParameters(rowsCount)
+    ShowBars(rowsCount)
+end sub
+
+sub ShowParameters(rowsCount as Integer)
+
+    For i = 1 to 5
+        if i <= rowsCount then
+            SendGuiParameterShow("LABEL_" & CStr(i), 1)
+            SendGuiParameterShow("BAR_" & CStr(i), 1)
+        else
+            SendGuiParameterShow("LABEL_" & CStr(i), 0)
+            SendGuiParameterShow("BAR_" & CStr(i), 0)
+        end if
+    next
+
+    dim otherParameters as Array[String]
+    otherParameters.Push("PRECISION")
+    otherParameters.Push("DECIMAL_POINT")
+    otherParameters.Push("SCALE_LABELS")
+    otherParameters.Push("SCALE_ALL_BARS")
+    otherParameters.Push("APPLY_CHANGES")
+
+    For i = 0 to otherParameters.UBound
+        if rowsCount <> 0 then
+         SendGuiParameterShow(otherParameters[i], 1)
+        else
+         SendGuiParameterShow(otherParameters[i], 0)
+        end if
+    next
+end sub
+
+sub ShowBars(rowsCount as Integer)
+    For i = 1 to 5
+        dim currentContainer as Container = Scene.FindContainer("Row_" & CStr(i))
+
+        if i <= rowsCount then 
+            currentContainer.Active = true
+        else
+            currentContainer.Active = false
+        end if
+
+        currentContainer.Update()
+    next
+end sub
+
+function IsDeactivateButtonClicked() as Boolean
+    IsDeactivateButtonClicked = GetParameterBool("DEACTIVATE")
+end function
+
+sub ActivateParameters(deactivate as Boolean)
+    dim integerValue as Integer
+
+    if deactivate = true then
+     integerValue = 0
+    else
+     integerValue = 1
+    end if
+
+    For i = 1 to 5
+        SendGuiStatus("LABEL_" & CStr(i), integerValue)
+        SendGuiStatus("BAR_" & CStr(i), integerValue)
+    next
+
+    SendGuiStatus("BARS_COUNT", integerValue)
+    SendGuiStatus("PRECISION", integerValue)
+    SendGuiStatus("DECIMAL_POINT", integerValue)
+    SendGuiStatus("SCALE_LABELS", integerValue)
+    SendGuiStatus("SCALE_ALL_BARS", integerValue)
+    SendGuiStatus("APPLY_CHANGES", integerValue)
+end sub

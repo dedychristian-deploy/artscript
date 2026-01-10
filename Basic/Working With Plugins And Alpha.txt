@@ -1,0 +1,80 @@
+sub OnInitParameters()
+    RegisterParameterString("GEOMETRY_PLUGIN_NAME", "GEOMETRY PLUGIN NAME", "", 50, 100, "")
+    RegisterParameterString("FUNCTION_PLUGIN_NAME", "FUNCTION PLUGIN NAME", "", 50, 100, "")
+
+    RegisterParameterDouble("SET_PARAMETER_GEOMETRY", "SET PARAMETER OF GEOMETRY PLUGIN", 100, 0, 1000)
+    RegisterParameterString("SET_PARAMETER_FUNCTION", "SET PARAMETER OF FUNCTION PLUGIN", "", 60, 100, "")
+    RegisterParameterDouble("SET_ALPHA", "SET ALPHA", 100, 0, 100)
+    RegisterPushButton("CREATE_GEOMETRY", "ADD GEOMETRY PLUGIN", 1)
+    RegisterPushButton("CREATE_FUNCTION", "ADD FUNCTION PLUGIN", 2)
+    RegisterPushButton("CREATE_ALPHA", "ADD ALPHA", 3)
+end sub
+
+sub OnParameterChanged(parameterName As String)
+  if parameterName = "SET_PARAMETER_GEOMETRY" then
+    SetParameterOfGeometryPlugin("radius", "target", GetParameterDouble("SET_PARAMETER_GEOMETRY"))
+  elseif parameterName = "SET_PARAMETER_FUNCTION" then
+    SetParameterOfFunctionPlugin("ControlKeyframe", "description", "target", GetParameterString("SET_PARAMETER_FUNCTION"))
+  elseif parameterName = "SET_ALPHA" then
+    SetAlpha("target", GetParameterDouble("SET_ALPHA"))
+  end if
+end sub
+
+sub OnExecAction(buttonId As Integer)
+   if buttonId = 1 then
+    'BUILT_IN*GEOM*Noggi 
+        dim nameOfPlugin as String = GetParameterString("GEOMETRY_PLUGIN_NAME")
+        nameOfPlugin.Trim()
+        AddPlugin("BUILT_IN*GEOM*" & nameOfPlugin, "target", "geometry")
+    elseif buttonId = 2 then
+        dim nameOfPlugin as String = GetParameterString("FUNCTION_PLUGIN_NAME")
+        nameOfPlugin.Trim()
+        'BUILT_IN*FUNCTION*NAME_OF_PLUGIN
+        AddPlugin("BUILT_IN*FUNCTION*" & nameOfPlugin, "target", "function")
+    elseif buttonId = 3 then
+        AddAlpha("target")
+   end if
+end sub
+
+sub AddPlugin(location as String, containerName as String, type as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+
+    if type = "geometry" then
+        targetContainer.CreateGeometry(location)
+    elseif type = "function" then
+        targetContainer.CreateFunction(location)
+    end if
+
+    targetContainer.Update()
+end sub
+
+sub SetParameterOfGeometryPlugin(parameterName as String, containerName as String, value as Double)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+
+    dim geometryPlugin as PluginInstance = targetContainer.GetGeometryPluginInstance()
+
+    geometryPlugin.SetParameterDouble(parameterName, value)
+
+    targetContainer.Update()
+end sub
+
+sub SetParameterOfFunctionPlugin(nameOfPlugin as String, parameterName as String, containerName as String, value as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+
+    dim functionPlugin as PluginInstance = targetContainer.GetFunctionPluginInstance(nameOfPlugin)
+    functionPlugin.SetParameterString(parameterName, value)
+
+    targetContainer.Update()
+end sub
+
+sub AddAlpha(containerName as String)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+    targetContainer.CreateAlpha()
+    targetContainer.Update()
+end sub
+
+sub SetAlpha(containerName as String, input as Double)
+    dim targetContainer as Container = Scene.FindContainer(containerName)
+    targetContainer.Alpha.Value = input
+    targetContainer.Update()
+end sub
