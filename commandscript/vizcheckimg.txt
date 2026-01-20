@@ -1,0 +1,34 @@
+Dim pilot1 as Double
+
+sub OnInitParameters()
+RegisterPushButton("Execute1", "Execute1", 1)
+RegisterPushButton("Execute2", "Execute2", 2)
+RegisterPushButton("Execute3", "Execute3", 3)
+RegisterPushButton("Execute4", "Execute4", 4)
+RegisterPushButton("Execute5", "Execute5", 5)
+RegisterPushButton("Execute6", "Execute1", 6)
+RegisterPushButton("Execute7", "Execute1", 7)
+RegisterPushButton("Execute8", "Execute1", 8)
+RegisterPushButton("Execute9", "Execute1", 9)
+RegisterPushButton("Execute10", "Execute10", 10)
+end sub
+
+sub OnExecAction(buttonId As Integer)
+Dim ImageInput1,ImageInput2 as String
+
+println this.GetDirector().Name
+
+ImageInput1 = This.GetChildContainerByIndex(buttonId-1).childcontainer.GetFunctionPluginInstance("ControlImage").GetParameterString("input")
+ImageInput2 = This.GetChildContainerByIndex(buttonId-1).nextcontainer.childcontainer.GetFunctionPluginInstance("ControlImage").GetParameterString("input")
+
+println ImageInput1
+println ImageInput2
+
+If ImageInput1 <> ImageInput2 Then
+	println "next is not same"
+Else
+	println "next is same"
+	System.SendCommand("#"& this.GetDirector().vizid &"*STAGE*DIRECTOR*"& this.GetDirector().Name &" SHOW $pilot" & cstr(buttonId+1))
+End If
+
+End Sub
