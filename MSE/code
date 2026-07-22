@@ -1,0 +1,153 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Net.Http;
+using System.Security;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Linq;
+using static System.Net.WebRequestMethods;
+namespace MSEDirectSendData
+{
+    public partial class Form1 : Form
+    {
+        private static readonly HttpClient client = new HttpClient();
+
+        private string url_take = "";
+        private string url_update = "";
+        private string url_activation = "";
+        private string url_data_element = "";
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+
+        private async void btnTake_Click(object sender, EventArgs e)
+        {
+            string text = textBox1.Text;
+
+            await UpdateViz(text);
+        }
+
+        private async Task SendTake()
+        {
+            var content = new StringContent("/external/pilotdb/elements/" + txtElementID.Text, Encoding.UTF8, "text/plain");
+            url_take = "http://" + txtMSEIP.Text + ":8580/profiles/" + txtProfile.Text + "/take";
+            var res = await client.PostAsync(url_take, content);
+            var result = await res.Content.ReadAsStringAsync();
+
+        }
+
+        private async Task SendTakeOut()
+        {
+            var content = new StringContent("/external/pilotdb/elements/" + txtElementID.Text, Encoding.UTF8, "text/plain");
+            url_take = "http://" + txtMSEIP.Text + ":8580/profiles/" + txtProfile.Text + "/out";
+            var res = await client.PostAsync(url_take, content);
+            var result = await res.Content.ReadAsStringAsync();
+
+        }
+
+        private async Task UpdateViz(string text)
+        {
+            string safeText = SecurityElement.Escape(text);
+
+            string strPayloadServer =
+                $"http://{txtMSEIP.Text}:8580/models/vdf/external/pilotdb/master_templates/{txtTemplateID.Text}";
+
+            url_update =
+                $"http://{txtMSEIP.Text}:8580/element/storage/playlists/{{{txtPlaylistUUID.Text}}}/elements/ref#{txtElementID.Text}";
+
+            var payload = $@"
+            <payload xmlns=""http://www.vizrt.com/types"" model=""{strPayloadServer}"">
+                <field name=""{txtFieldID.Text}"">
+                    <value>{safeText}</value>
+                </field>
+            </payload>";
+
+            var content = new StringContent(
+                payload,
+                Encoding.UTF8,
+                "application/vnd.vizrt.payload+xml");
+
+            try
+            {
+                HttpResponseMessage response = await client.PutAsync(url_update, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"PUT failed: {response.StatusCode}\n{error}");
+                    return;
+                }
+
+                await SendTake();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private async void btnGet_Click(object sender, EventArgs e)
+        {
+            url_data_element = "http://" + txtMSEIP.Text + ":8580/element_collection/storage/playlists/{" + txtPlaylistUUID.Text + "}";
+            HttpResponseMessage response = await client.GetAsync(url_data_element);
+            string result = await response.Content.ReadAsStringAsync();
+
+            var doc = XDocument.Parse(result);
+            XNamespace ns = "http://www.w3.org/2005/Atom";
+            var entries = doc.Descendants(ns + "entry");
+
+            foreach (var entry in entries)
+            {
+                var editMedia = entry
+                    .Elements(ns + "link")
+                    .FirstOrDefault(x => (string)x.Attribute("rel") == "edit-media");
+
+                if (editMedia != null)
+                {
+                    string href = editMedia.Attribute("href").Value;
+                    richTextBox1.AppendText(href + "\n");
+                }
+            }
+
+            //richTextBox1.Text = result;
+        }
+
+        private async void btnActivatePlaylist_Click(object sender, EventArgs e)
+        {
+            string PlaylistProfile;
+            url_activation = "http://" + txtMSEIP.Text + ":8580/activation/storage/playlists/{" + txtPlaylistUUID.Text + "}";
+            url_update = url_activation + "/elements/ref%23";
+
+            PlaylistProfile = "http://" + txtPlaylistUUID.Text + ":8580/profiles/" + txtProfile.Text;
+            var activation = $@"
+            <playlistactivation>
+              <active_on_profile>{PlaylistProfile}</active_on_profile>
+            </playlistactivation>";
+            var content = new StringContent(activation, Encoding.UTF8, "application/vnd.vizrt.playlistactivation+xml");
+
+            try
+            {
+                var res = await client.PutAsync(url_activation, content);
+                var result = await res.Content.ReadAsStringAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+        private async void btnTakeOut_Click(object sender, EventArgs e)
+        {
+            await SendTakeOut();
+        }
+    }
+}
