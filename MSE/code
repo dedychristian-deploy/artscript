@@ -98,22 +98,29 @@ namespace MSEDirectSendData
             url_data_element = "http://" + txtMSEIP.Text + ":8580/element_collection/storage/playlists/{" + txtPlaylistUUID.Text + "}";
             HttpResponseMessage response = await client.GetAsync(url_data_element);
             string result = await response.Content.ReadAsStringAsync();
-
-            var doc = XDocument.Parse(result);
-            XNamespace ns = "http://www.w3.org/2005/Atom";
-            var entries = doc.Descendants(ns + "entry");
-
-            foreach (var entry in entries)
+            try
             {
-                var editMedia = entry
-                    .Elements(ns + "link")
-                    .FirstOrDefault(x => (string)x.Attribute("rel") == "edit-media");
+                var doc = XDocument.Parse(result);
+                XNamespace ns = "http://www.w3.org/2005/Atom";
+                var entries = doc.Descendants(ns + "entry");
 
-                if (editMedia != null)
+                foreach (var entry in entries)
                 {
-                    string href = editMedia.Attribute("href").Value;
-                    richTextBox1.AppendText(href + "\n");
+                    var editMedia = entry
+                        .Elements(ns + "link")
+                        .FirstOrDefault(x => (string)x.Attribute("rel") == "edit-media");
+
+                    if (editMedia != null)
+                    {
+                        string href = editMedia.Attribute("href").Value;
+                        richTextBox1.AppendText(href + "\n");
+                    }
                 }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
             }
 
             //richTextBox1.Text = result;
