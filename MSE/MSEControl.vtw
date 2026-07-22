@@ -1,0 +1,401 @@
+object frmTemplateDesign_1: TfrmTemplateDesign_1
+  Tag = 10322
+  Left = 548
+  Top = 218
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = '[MSE Control] - Designing'
+  ClientHeight = 358
+  ClientWidth = 481
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -14
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  KeyPreview = True
+  OldCreateOrder = True
+  Scaled = False
+  Visible = True
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnPaint = FormPaint
+  PixelsPerInch = 120
+  TextHeight = 16
+  object TntGroupBox2: TTntGroupBox
+    Left = 8
+    Top = 144
+    Width = 448
+    Height = 176
+    TabOrder = 1
+    Visible = False
+    OnClick = ControlClick
+    OnDragDrop = ControlDragDrop
+    OnDragOver = ControlDragOver
+    object txtElement: TTWUniEdit
+      Left = 18
+      Top = 32
+      Width = 414
+      Height = 24
+      Color = 50331647
+      Ctl3D = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -15
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      TabOrder = 0
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      HideOnEmpty = False
+      UHPathIsRelative = False
+    end
+    object txtTake: TTWUniEdit
+      Left = 18
+      Top = 64
+      Width = 414
+      Height = 24
+      Color = 50331647
+      Ctl3D = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -15
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      TabOrder = 1
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      HideOnEmpty = False
+      UHPathIsRelative = False
+    end
+    object txtContinue: TTWUniEdit
+      Left = 18
+      Top = 96
+      Width = 414
+      Height = 24
+      Color = 50331647
+      Ctl3D = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -15
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      TabOrder = 2
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      HideOnEmpty = False
+      UHPathIsRelative = False
+    end
+    object txtTakeOut: TTWUniEdit
+      Left = 18
+      Top = 128
+      Width = 414
+      Height = 24
+      Color = 50331647
+      Ctl3D = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -15
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentCtl3D = False
+      ParentFont = False
+      TabOrder = 3
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      HideOnEmpty = False
+      UHPathIsRelative = False
+    end
+  end
+  object TntGroupBox1: TTntGroupBox
+    Left = 9
+    Top = 12
+    Width = 447
+    Height = 292
+    Caption = 'MSE '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -14
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 0
+    OnClick = ControlClick
+    OnDragDrop = ControlDragDrop
+    OnDragOver = ControlDragOver
+    object lblElement: TTWUniLabel
+      Left = 16
+      Top = 146
+      Width = 408
+      Height = 16
+      Alignment = taCenter
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      UHPathIsRelative = False
+    end
+    object lblProfil: TTWUniLabel
+      Left = 21
+      Top = 72
+      Width = 405
+      Height = 16
+      Alignment = taCenter
+      AutoSize = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      Transparent = True
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      UHPathIsRelative = False
+    end
+    object btnTake: TTWUniButton
+      Left = 16
+      Top = 174
+      Width = 130
+      Height = 98
+      Caption = 'TAKE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 0
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      Color = 4259584
+    end
+    object btnContinue: TTWUniButton
+      Left = 155
+      Top = 174
+      Width = 130
+      Height = 98
+      Caption = 'CONTINUE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      Color = 16744576
+    end
+    object btnakeOut: TTWUniButton
+      Left = 296
+      Top = 174
+      Width = 130
+      Height = 98
+      Caption = 'TAKE OUT'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      Color = clRed
+    end
+    object btnElement: TTWFeedLinker
+      Left = 18
+      Top = 96
+      Width = 410
+      Height = 38
+      Caption = 'SELECT ELEMENT'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 3
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      Color = 46972345
+      Source = 'http://localhost:8580/directory/'
+    end
+    object btnProfiles: TTWFeedLinker
+      Left = 17
+      Top = 26
+      Width = 410
+      Height = 38
+      Caption = 'SELECT PROFILE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 34541327
+      Font.Height = -13
+      Font.Name = 'Verdana'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 4
+      OnClick = ControlClick
+      OnDragDrop = ControlDragDrop
+      OnDragOver = ControlDragOver
+      Color = 46972345
+      Source = 'http://127.0.0.1:8580/profiles/'
+    end
+  end
+  object DCScripter1: TDCScripter
+    Events = <
+      item
+        CallExisting = True
+        Event = 'OnFeedItemSelected'
+        ScriptMethod = 'btnProfilesFeedItemSelected'
+      end
+      item
+        CallExisting = True
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Event = 'OnFeedItemSelected'
+        ScriptMethod = 'btnPagesFeedItemSelected'
+      end
+      item
+        CallExisting = True
+        Component = btnElement
+        Event = 'OnFeedItemSelected'
+        ScriptMethod = 'btnElementFeedItemSelected'
+      end
+      item
+        CallExisting = True
+        Component = btnProfiles
+        Event = 'OnFeedItemSelected'
+        ScriptMethod = 'btnProfilesFeedItemSelected'
+      end
+      item
+        CallExisting = True
+        Component = btnTake
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Component = btnContinue
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end
+      item
+        CallExisting = True
+        Component = btnakeOut
+        Event = 'OnClick'
+        ScriptMethod = 'btnControl'
+      end>
+    Language = 'VBScript'
+    Script.Strings = (
+      'Sub InitForm'
+      '    Reset()'
+      'End Sub'
+      ''
+      'Sub btnProfilesFeedItemSelected(entry)'
+      '    SetUnicodeValue lblProfil, entry.Title'
+      '    SetUnicodeValue txtTake, entry.GetLinkWithRelation("take")'
+      
+        '    SetUnicodeValue txtContinue, entry.GetLinkWithRelation("cont' +
+        'inue")'
+      '    SetUnicodeValue txtTakeOut, entry.GetLinkWithRelation("out")'
+      'End Sub'
+      ''
+      'Sub btnElementFeedItemSelected(entry)'
+      '    SetUnicodeValue lblElement, entry.Title'
+      
+        '    SetUnicodeValue txtElement, entry.GetLinkWithRelation("alter' +
+        'nate")'
+      'End Sub'
+      ''
+      'Sub btnControl(Sender)'
+      '    Select Case Sender.Name'
+      '       Case "btnTake"'
+      '           If txtTake.Text <> "" And txtElement.Text <> "" Then'
+      '              HttpRequest txtTake.Text,txtElement.Text'
+      '           End If'
+      '       Case "btnContinue"'
+      
+        '           If txtContinue.Text <> "" And txtElement.Text <> "" T' +
+        'hen'
+      '              HttpRequest txtContinue.Text,txtElement.Text'
+      '           End If'
+      '       Case "btnakeOut"'
+      
+        '           If txtTakeOut.Text <> "" And txtElement.Text <> "" Th' +
+        'en'
+      '              HttpRequest txtTakeOut.Text,txtElement.Text'
+      '           End If'
+      '    End Select'
+      'End sub'
+      ''
+      'Function HttpRequest(sUrl,sRequest)'
+      
+        '    Dim http: Set http = CreateObject("Msxml2.ServerXMLHTTP.6.0"' +
+        ')'
+      '    http.Open "POST", sUrl, False'
+      '    http.SetRequestHeader "Content-Type", "text/plain"'
+      '    http.SetRequestHeader "Content-Length", Len(sRequest)'
+      '    http.Send sRequest'
+      '    If http.Status <> 200 Then'
+      '       HttpRequest  = ""'
+      '       Msgbox http.ResponseText'
+      '    Else'
+      '       HttpRequest = http.ResponseText'
+      '    End If'
+      '    Set http = Nothing'
+      'End function'
+      ''
+      'Sub Reset()'
+      '    lblProfil.Caption = ""'
+      '    lblElement.Caption = ""'
+      '    txtElement.Text = ""'
+      '    txtTake.Text = ""'
+      '    txtContinue.Text = ""'
+      '    txtTakeOut.Text = ""'
+      'End Sub')
+    Left = 424
+  end
+end
