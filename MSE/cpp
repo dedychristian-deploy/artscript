@@ -1,0 +1,56 @@
+bool CV_Example::parse_json_(const string& json)
+{
+    string ric;
+    double last = 0.0;
+    double change = 0.0;
+    double percent_change = 0.0;
+    double open = 0.0;
+    double high = 0.0;
+    double low = 0.0;
+    double bid = 0.0;
+    double ask = 0.0;
+    double volume = 0.0;
+
+    if (!extract_json_string_(json, "RIC", ric))
+        return false;
+
+    if (!extract_json_number_(json, "LAST", last))
+        return false;
+
+    if (!extract_json_number_(json, "CHANGE", change))
+        return false;
+
+    if (!extract_json_number_(json, "PERCENT_CHANGE", percent_change))
+        return false;
+
+    if (!extract_json_number_(json, "OPEN", open))
+        return false;
+
+    if (!extract_json_number_(json, "HIGH", high))
+        return false;
+
+    if (!extract_json_number_(json, "LOW", low))
+        return false;
+
+    if (!extract_json_number_(json, "BID", bid))
+        return false;
+
+    if (!extract_json_number_(json, "ASK", ask))
+        return false;
+
+    if (!extract_json_number_(json, "VOLUME", volume))
+        return false;
+
+    m_ric_ = ric;
+    m_last_ = last;
+    m_change_ = change;
+    m_percent_change_ = percent_change;
+    m_open_ = open;
+    m_high_ = high;
+    m_low_ = low;
+    m_bid_ = bid;
+    m_ask_ = ask;
+    m_volume_ = volume;
+
+    return true;
+}
