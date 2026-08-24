@@ -3038,7 +3038,7 @@
 
             // Baru rapikan layout
     await sendVizCommand(
-        `-1 MAIN_SCENE*TREE*$SCRIPT*SCRIPT INVOKE getboxes ${data.boxType} ${order}`
+        `-1 MAIN_SCENE*TREE*$SCRIPT*SCRIPT INVOKE apply_layout ${data.boxType} ${order}`
     );
 
     // Update Service harus siap sebelum TAKE
