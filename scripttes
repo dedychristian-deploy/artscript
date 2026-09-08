@@ -1,0 +1,414 @@
+{\"boxType\":3,\"boxTypeName\":\"3BOX\",\"boxes\":[{\"slot\":0,\"box\":0},{\"slot\":1,\"box\":1},{\"slot\":2,\"box\":2}]}
+
+
+dim a as String
+dim b as Integer
+
+
+sub setter()
+
+    Stage.FindDirector("SWITCH").FindActionChannel("ACT").FindKeyframe("ACT").ActionString = "THIS_DIRECTOR SHOW 0;"
+
+end sub
+
+
+sub setterreset()
+
+    Stage.FindDirector("SWITCH").FindActionChannel("ACT").FindKeyframe("ACT").ActionString = ""
+
+end sub
+
+
+sub OnInit()
+
+end sub
+
+
+sub print_order(boxType as Integer)
+
+    dim c as Container
+    dim i as Integer
+
+    c = Scene.FindContainer("BOX_LAYOUTS").GetChildContainerByIndex(boxType)
+
+    if not c.Valid then
+        exit sub
+    end if
+
+    println "===== ORDER ====="
+
+    for i = 0 to c.ChildContainerCount - 1
+        println CStr(i) & " = " & c.GetChildContainerByIndex(i).Name
+    next
+
+end sub
+
+
+' =========================================================
+' APPLY LAYOUT
+' =========================================================
+
+sub apply_layout_live(boxType as Integer, boxes as StringMap)
+
+    println "===== APPLY LAYOUT ====="
+    println "BOX TYPE = " & CStr(boxType)
+
+    reorder_edited_fast(boxType, boxes)
+
+    Scene.FindContainer("BOX_LAYOUTS").ScriptPluginInstance.SetParameterInt("idxLayout", boxType)
+    Scene.FindContainer("BOX_LAYOUTS").ScriptPluginInstance.Script.Execute()
+
+    println "===== EDITED FINAL ====="
+
+end sub
+
+
+' =========================================================
+' RECEIVE JSON FROM TEMPLATE
+'
+' TEMPLATE SEND:
+'
+' buffer_put(
+'   "RENDERER*TREE*$SCRIPT*SCRIPT INVOKE msg_layout_edited " &
+'   tJson.UTF8Text
+' )
+'
+' dataLayout = tJson.UTF8Text
+' =========================================================
+
+sub msg_layout_edited(dataLayout as String)
+
+    a = dataLayout
+
+    println "===== HTML EDITED RECEIVED ====="
+    println "A SAVED = " & a
+
+    exec_msg_layout_edited()
+
+end sub
+
+
+' =========================================================
+' PARSE JSON
+' =========================================================
+
+sub exec_msg_layout_edited()
+
+    dim parserContainer as Container
+    dim dataMap as StringMap
+    dim boxes as StringMap
+    dim boxType as Integer
+    dim boxTypeName as String
+
+    if a = "" then
+        println "===== NO JSON DATA - SKIP ====="
+        exit sub
+    end if
+
+    println "===== EXEC LAYOUT JSON ====="
+    println "DATA = " & a
+
+    parserContainer = Scene.FindContainer("JSONParser")
+
+    if not parserContainer.Valid then
+        println "JSONParser CONTAINER NOT FOUND"
+        exit sub
+    end if
+	println "A=[" & a & "]"
+	println "A LENGTH=" & CStr(a.Length)
+    dataMap = (StringMap)parserContainer.ScriptPluginInstance.Script.JsonDecode(a)
+
+    boxType = CInt(dataMap["boxType"])
+    boxTypeName = (String)dataMap["boxTypeName"]
+    boxes = (StringMap)dataMap["boxes"]
+
+    println "BOX TYPE = " & CStr(boxType)
+    println "BOX TYPE NAME = " & boxTypeName
+
+    apply_layout_live(boxType, boxes)
+
+    a = ""
+
+    Stage.FindDirector("SWITCH").StartAnimation()
+
+end sub
+
+
+' =========================================================
+' REORDER
+'
+' JSON:
+'
+' slot 0 -> BOX_01
+' slot 1 -> BOX_02
+' slot 2 -> BOX_03
+'
+' box = target physical index
+' =========================================================
+
+sub reorder_edited_fast(boxType as Integer, boxes as StringMap)
+
+    dim c as Container
+    dim box as Container
+    dim item as StringMap
+
+    dim ordered as Array[Container]
+    dim usedNames as Array[String]
+
+    dim i as Integer
+    dim j as Integer
+
+    dim slotIndex as Integer
+    dim targetIndex as Integer
+
+    dim boxName as String
+    dim isUsed as Boolean
+
+
+    println "===== REORDER EDITED FAST ====="
+    println "BOX TYPE = " & CStr(boxType)
+
+
+    c = Scene.FindContainer("BOX_LAYOUTS").GetChildContainerByIndex(boxType)
+
+    if not c.Valid then
+
+        println "INVALID LAYOUT INDEX = " & CStr(boxType)
+
+        exit sub
+
+    end if
+
+
+    ' CREATE EMPTY TARGET SLOTS
+
+    for i = 0 to c.ChildContainerCount - 1
+
+        ordered.Push(c)
+
+    next
+
+
+    ' PLACE SLOT INTO TARGET BOX INDEX
+
+    for i = 0 to CInt(boxes["ubound"])
+
+        item = (StringMap)boxes[CStr(i)]
+
+        slotIndex = CInt(item["slot"])
+        targetIndex = CInt(item["box"])
+
+
+        ' SLOT 0 = BOX_01
+        ' SLOT 1 = BOX_02
+        ' SLOT 2 = BOX_03
+
+        if slotIndex < 9 then
+
+            boxName = "BOX_0" & CStr(slotIndex + 1)
+
+        else
+
+            boxName = "BOX_" & CStr(slotIndex + 1)
+
+        end if
+
+
+        box = c.FindSubContainer(boxName)
+
+
+        if box.Valid then
+
+            if targetIndex >= 0 and targetIndex < ordered.Size then
+
+                ordered[targetIndex] = box
+
+                usedNames.Push(boxName)
+
+                println "TARGET " & CStr(targetIndex) & " = " & boxName
+
+            end if
+
+        end if
+
+    next
+
+
+    ' FILL UNUSED BOXES
+
+    for i = 0 to c.ChildContainerCount - 1
+
+        box = c.GetChildContainerByIndex(i)
+
+        isUsed = false
+
+
+        for j = 0 to usedNames.Size - 1
+
+            if box.Name = usedNames[j] then
+
+                isUsed = true
+
+                exit for
+
+            end if
+
+        next
+
+
+        if not isUsed then
+
+            for j = 0 to ordered.Size - 1
+
+                if ordered[j] = c then
+
+                    ordered[j] = box
+
+                    println "FILL " & CStr(j) & " = " & box.Name
+
+                    exit for
+
+                end if
+
+            next
+
+        end if
+
+    next
+
+
+    ' APPLY FINAL ORDER
+
+    for i = ordered.ubound to 0 step -1
+
+        box = ordered[i]
+
+        println "MOVE " & box.Name & " -> " & CStr(i)
+
+        box.MoveTo(c, TL_DOWN)
+
+    next
+
+
+    Scene.UpdateSceneTree()
+
+    println "===== REORDER EDITED FAST DONE ====="
+
+    print_order(boxType)
+
+end sub
+
+
+' =========================================================
+' RESET
+' =========================================================
+
+sub msg_director_take(boxType as Integer)
+
+    println "===== DIRECTOR TAKE RESET ====="
+    println "BOX TYPE = " & CStr(boxType)
+
+    reorder_clear(boxType)
+
+end sub
+
+
+sub reorder_clear(boxType as Integer)
+
+    dim c as Container
+    dim box as Container
+    dim i as Integer
+    dim boxName as String
+
+    println "===== REORDER CLEAR ====="
+    println "BOX TYPE = " & CStr(boxType)
+
+
+    c = Scene.FindContainer("BOX_LAYOUTS").GetChildContainerByIndex(boxType)
+
+
+    if not c.Valid then
+
+        println "INVALID LAYOUT INDEX = " & CStr(boxType)
+
+        exit sub
+
+    end if
+
+
+    for i = 12 to 1 step -1
+
+        if i < 10 then
+
+            boxName = "BOX_0" & CStr(i)
+
+        else
+
+            boxName = "BOX_" & CStr(i)
+
+        end if
+
+
+        box = c.FindSubContainer(boxName)
+
+
+        if box.Valid then
+
+            println "ORDER " & boxName
+
+            box.MoveTo(c, TL_DOWN)
+
+        end if
+
+    next
+
+
+    Scene.FindContainer("BOX_LAYOUTS").ScriptPluginInstance.SetParameterInt("idxLayout", boxType)
+
+    Scene.FindContainer("BOX_LAYOUTS").ScriptPluginInstance.Script.Execute()
+
+
+    Scene.UpdateSceneTree()
+
+
+    println "===== REORDER CLEAR DONE ====="
+
+    print_order(boxType)
+
+end sub
+
+
+sub OnInitParameters()
+
+    RegisterPushButton("reset", "RESET DEFAULT", 0)
+    RegisterPushButton("edited", "EDITED RELAYOUT", 1)
+    RegisterPushButton("exec", "EXECUTE", 2)
+
+end sub
+
+
+sub OnExecAction(buttonId As Integer)
+
+    if buttonId = 0 then
+
+        for i = 0 to 19
+
+            reorder_clear(i)
+
+        next
+
+        reorder_clear(1)
+
+
+    elseif buttonId = 1 then
+
+        exec_msg_layout_edited()
+
+
+    elseif buttonId = 2 then
+
+        println "AAA"
+
+    end if
+
+end sub
