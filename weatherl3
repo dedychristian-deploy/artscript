@@ -1,0 +1,588 @@
+structure DayForecast
+
+    dayName as string
+    icon as string
+    high as string
+    low as string
+
+end structure
+
+
+structure WeatherCity
+
+    name as string
+    conditionName as string
+    highTemp as string
+    lowTemp as string
+    icon as string
+    humidity as string
+    uvIndex as string
+    windSpeed as string
+    windDirection as string
+    windRotation as vertex
+    forecasts as array[DayForecast]
+
+end structure
+
+
+dim gDataPath = "C:\\data\\WeatherData.json"
+
+dim gIconPath = "IMAGE*/AJMubasher/40_RESOURCE/2026/ICONS/WEATHER/"
+
+dim messageContainer as Container
+dim timerContainer as Container
+
+dim gWeatherCities as array[WeatherCity]
+
+dim gCurrentCityIndex = 0
+dim gCurrentMainIndex = 1
+dim gCurrentHighlightIndex = 0
+
+
+sub OnInitParameters()
+
+    RegisterPushButton("getData", "Get Data", 0)
+    RegisterPushButton("nextItem", "Next Item", 1)
+    RegisterPushButton("firstLoadTimer", "First Load Timer", 2)
+    RegisterPushButton("clear", "Clear", 3)
+
+    RegisterParameterContainer("messageContainer", "Message Container")
+    RegisterParameterContainer("timerContainer", "Timer Container")
+
+end sub
+
+
+sub OnInit()
+
+    messageContainer = GetParameterContainer("messageContainer")
+    timerContainer = GetParameterContainer("timerContainer")
+
+end sub
+
+
+' ============================================================
+' INITIAL MAIN PANELS
+' ============================================================
+
+sub InitMainPanels()
+
+    gCurrentMainIndex = 1
+
+    RenderCity(1, 1)
+    RenderCity(2, 2)
+    RenderCity(3, 3)
+
+    ' Sama seperti Social:
+    ' Panel4 adalah buffer, jadi initial tidak perlu di-render di sini.
+    ' RenderCity(4, 4)
+
+end sub
+
+
+' ============================================================
+' INITIAL HIGHLIGHT PANELS
+' ============================================================
+
+sub InitHighlightPanels()
+
+    gCurrentHighlightIndex = 0
+
+    RenderHighlight(0, 1)
+    RenderHighlight(1, 2)
+
+end sub
+
+
+' ============================================================
+' LOAD WEATHER JSON
+' ============================================================
+
+sub LoadWeatherData()
+
+    dim dataString as string
+
+    System.loadTextFile(gDataPath, dataString)
+
+    dim parser = scene.findContainer("JSONParser").script
+    dim dataMap = (stringmap)parser.jsonDecode(dataString)
+
+    dim cities = (stringmap)dataMap["weathercities"]
+
+    gWeatherCities.clear()
+
+    for i = 0 to (integer)cities["ubound"]
+
+        dim cityMap = (stringmap)cities[(string)i]
+
+        dim newCity as WeatherCity
+
+        newCity.name = (string)cityMap["name"]
+        newCity.conditionName = (string)cityMap["conditionAr"]
+        newCity.highTemp = (string)cityMap["highTemp"]
+        newCity.lowTemp = (string)cityMap["lowTemp"]
+        newCity.icon = (string)cityMap["icon"]
+        newCity.humidity = (string)cityMap["humidity"]
+        newCity.windSpeed = (string)cityMap["windspeed"]
+        newCity.windDirection = (string)cityMap["winddirection"]
+
+        newCity.windRotation = GetRotationForWindDirection(newCity.windDirection)
+
+        newCity.forecasts.clear()
+
+        dim forecastsMap = (stringmap)cityMap["forecast"]
+
+        for j = 0 to (integer)forecastsMap["ubound"]
+
+            dim forecastMap = (stringmap)forecastsMap[(string)j]
+
+            dim newForecast as DayForecast
+
+            newForecast.dayName = (string)forecastMap["dayName"]
+            newForecast.icon = (string)forecastMap["icon"]
+            newForecast.high = (string)forecastMap["max"]
+            newForecast.low = (string)forecastMap["min"]
+
+            newCity.forecasts.push(newForecast)
+
+        next
+
+        gWeatherCities.push(newCity)
+
+    next
+
+    println("JSON LOADED")
+    println("TOTAL CITY = " & cities["length"])
+    println("TOTAL STORED = " & gWeatherCities.size)
+    println("FIRST CITY = " & gWeatherCities[0].name)
+
+end sub
+
+
+' ============================================================
+' WEATHER ICON
+' ============================================================
+
+sub SetIconOnContainer(c as container, icon as string, active as String)
+
+    dim iconName = icon
+
+    iconName.makeLower()
+
+    c.createTexture(gIconPath & active & "/" & iconName)
+
+    c.texture.MapType = TX_MAP_VERTEX
+    c.texture.QualityType = TX_QUAL_LINEAR
+    c.texture.wrapType = TX_WRAP_CLAMP
+
+end sub
+
+
+' ============================================================
+' RENDER MAIN PANEL
+' ============================================================
+
+sub RenderCity(index as integer, panelNumber as integer)
+
+    dim theCity = gWeatherCities[index]
+
+    dim thePanel = this.parentcontainer.findSubContainer("Panel" & panelNumber)
+
+    thePanel.findSubContainer("CityText").geometry.text = theCity.name
+    thePanel.findSubContainer("ConditionText").geometry.text = theCity.conditionName
+
+    thePanel.findSubContainer("WindSpeed").geometry.text = theCity.windSpeed
+
+    thePanel.findSubContainer("highTemp").geometry.text = theCity.highTemp
+    thePanel.findSubContainer("lowTemp").geometry.text = theCity.lowTemp
+    thePanel.findSubContainer("Humidity").geometry.text = theCity.humidity
+
+    SetIconOnContainer(thePanel.findSubContainer("CurrentWeatherIcon"),theCity.icon,"inactive")
+
+    if (theCity.windSpeed <> "") then
+
+        thePanel.findSubContainer("Wind").active = true
+
+        thePanel.findSubContainer("WindSpeedText").geometry.text = theCity.windSpeed
+
+        thePanel.findSubContainer("WIND$Direction").rotation.z = theCity.windRotation.z
+
+    else
+
+        thePanel.findSubContainer("WIND").active = true
+
+    end if
+
+
+    dim forecastContainer = thePanel.findSubContainer("BOTTOM")
+
+    for i = 0 to theCity.forecasts.ubound
+
+        dim c = forecastContainer.getChildContainerByIndex(i)
+
+        c.findSubContainer("DayNameText").geometry.text = theCity.forecasts[i].dayName
+
+        SetIconOnContainer(c.findSubContainer("WeatherIcon"),theCity.forecasts[i].icon,"inactive")
+
+        c.findSubContainer("HIGH$TemperatureText").geometry.text = theCity.forecasts[i].high
+
+        c.findSubContainer("LOW$TemperatureText").geometry.text = theCity.forecasts[i].low
+
+    next
+
+end sub
+
+
+' ============================================================
+' RENDER HIGHLIGHT
+' ============================================================
+
+sub RenderHighlight(index as integer, panelNumber as integer)
+
+    dim theCity = gWeatherCities[index]
+
+    dim thePanel = this.parentcontainer.findSubContainer("Highlight" & panelNumber)
+
+    thePanel.findSubContainer("CityText").geometry.text = theCity.name
+    thePanel.findSubContainer("ConditionText").geometry.text = theCity.conditionName
+
+    thePanel.findSubContainer("WindSpeed").geometry.text = theCity.windSpeed
+
+    thePanel.findSubContainer("highTemp").geometry.text = theCity.highTemp
+    thePanel.findSubContainer("lowTemp").geometry.text = theCity.lowTemp
+    thePanel.findSubContainer("Humidity").geometry.text = theCity.humidity
+
+    SetIconOnContainer(thePanel.findSubContainer("CurrentWeatherIcon"),theCity.icon,"active")
+
+    if (theCity.windSpeed <> "") then
+
+        thePanel.findSubContainer("Wind").active = true
+
+        thePanel.findSubContainer("WindSpeedText").geometry.text = theCity.windSpeed
+
+        thePanel.findSubContainer("WIND$Direction").rotation.z = theCity.windRotation.z
+
+    else
+
+        thePanel.findSubContainer("WIND").active = true
+
+    end if
+
+
+    dim forecastContainer = thePanel.findSubContainer("RIGHT")
+
+    for i = 0 to theCity.forecasts.ubound
+
+        dim c = forecastContainer.getChildContainerByIndex(i)
+
+        c.findSubContainer("DayNameText").geometry.text = theCity.forecasts[i].dayName
+
+        SetIconOnContainer(c.findSubContainer("WeatherIcon"),theCity.forecasts[i].icon,"active")
+
+        c.findSubContainer("HIGH$TemperatureText").geometry.text = theCity.forecasts[i].high
+
+        c.findSubContainer("LOW$TemperatureText").geometry.text = theCity.forecasts[i].low
+
+    next
+
+end sub
+
+
+' ============================================================
+' FIRST PANEL
+' SAMA SEPERTI SOCIAL RenderFirstPanel()
+' ============================================================
+
+sub RenderFirstPanel(index as integer)
+
+    dim theCity = gWeatherCities[index]
+
+    dim thePanel = this.parentcontainer.findSubContainer("FirstPanel")
+
+    thePanel.findSubContainer("CityText").geometry.text = theCity.name
+    thePanel.findSubContainer("ConditionText").geometry.text = theCity.conditionName
+
+    thePanel.findSubContainer("WindSpeed").geometry.text = theCity.windSpeed
+
+    thePanel.findSubContainer("highTemp").geometry.text = theCity.highTemp
+    thePanel.findSubContainer("lowTemp").geometry.text = theCity.lowTemp
+    thePanel.findSubContainer("Humidity").geometry.text = theCity.humidity
+
+    SetIconOnContainer(thePanel.findSubContainer("CurrentWeatherIcon"),theCity.icon,"active")
+
+    if (theCity.windSpeed <> "") then
+
+        thePanel.findSubContainer("Wind").active = true
+
+        thePanel.findSubContainer("WindSpeedText").geometry.text = theCity.windSpeed
+
+        thePanel.findSubContainer("WIND$Direction").rotation.z = theCity.windRotation.z
+
+    else
+
+        thePanel.findSubContainer("WIND").active = true
+
+    end if
+
+
+    dim forecastContainer = thePanel.findSubContainer("RIGHT")
+
+    for i = 0 to theCity.forecasts.ubound
+
+        dim c = forecastContainer.getChildContainerByIndex(i)
+
+        c.findSubContainer("DayNameText").geometry.text = theCity.forecasts[i].dayName
+
+        SetIconOnContainer(c.findSubContainer("WeatherIcon"),theCity.forecasts[i].icon,"active")
+
+        c.findSubContainer("HIGH$TemperatureText").geometry.text = theCity.forecasts[i].high
+
+        c.findSubContainer("LOW$TemperatureText").geometry.text = theCity.forecasts[i].low
+
+    next
+
+end sub
+
+
+' ============================================================
+' WIND ROTATION
+' ============================================================
+
+function GetRotationForWindDirection(direction as string) as vertex
+
+    dim dirVertex as vertex
+
+    select case direction
+
+        case "N"
+            dirVertex.z = 90.0
+
+        case "NE"
+            dirVertex.z = 45.0
+
+        case "E"
+            dirVertex.z = 0.0
+
+        case "SE"
+            dirVertex.z = -45.0
+
+        case "S"
+            dirVertex.z = -90.0
+
+        case "SW"
+            dirVertex.z = -135.0
+
+        case "W"
+            dirVertex.z = -180.0
+
+        case "NW"
+            dirVertex.z = -225.0
+
+    end select
+
+    GetRotationForWindDirection = dirVertex
+
+end function
+
+
+' ============================================================
+' START SHOW
+' PERSIS FLOW SOCIAL
+' ============================================================
+
+sub startShow()
+
+    LoadWeatherData()
+
+    RenderFirstPanel(0)
+
+    InitMainPanels()
+
+    InitHighlightPanels()
+
+end sub
+
+
+' ============================================================
+' NEXT ITEM TRANSITION
+' PERSIS FLOW SOCIAL
+' ============================================================
+
+sub OnNextItemTransition()
+
+    copyKey()
+
+    Scene.Map["initloadlt"] = "loop"
+
+
+    ' --------------------------------------------------------
+    ' MAIN
+    ' --------------------------------------------------------
+
+    dim nextIndex = gCurrentMainIndex + 1
+
+    if (nextIndex > gWeatherCities.ubound) then
+        nextIndex = 0
+    end if
+
+
+    for i = 1 to 3
+
+        RenderCity(nextIndex, i)
+
+        nextIndex++
+
+        if (nextIndex > gWeatherCities.ubound) then
+            nextIndex = 0
+        end if
+
+    next
+
+
+    ' --------------------------------------------------------
+    ' HIGHLIGHT
+    ' --------------------------------------------------------
+
+    dim currentHighlightIndex = gCurrentHighlightIndex + 1
+
+    if (currentHighlightIndex > gWeatherCities.ubound) then
+        currentHighlightIndex = 0
+    end if
+
+
+    RenderHighlight(currentHighlightIndex, 1)
+
+
+    dim nextHighlightIndex = currentHighlightIndex + 1
+
+    if (nextHighlightIndex > gWeatherCities.ubound) then
+        nextHighlightIndex = 0
+    end if
+
+
+    RenderHighlight(nextHighlightIndex, 2)
+
+end sub
+
+
+' ============================================================
+' UPDATE INDEX
+' PERSIS FLOW SOCIAL
+' ============================================================
+
+sub NextItem()
+
+    Scene.Map["initloadlt"] = "loop"
+
+
+    ' Main
+
+    gCurrentMainIndex++
+
+    if (gCurrentMainIndex > gWeatherCities.ubound) then
+        gCurrentMainIndex = 0
+    end if
+
+
+    ' Highlight
+
+    gCurrentHighlightIndex++
+
+    if (gCurrentHighlightIndex > gWeatherCities.ubound) then
+        gCurrentHighlightIndex = 0
+    end if
+
+end sub
+
+
+' ============================================================
+' OPTIONAL INDEX HELPER
+' SAMA DENGAN SOCIAL
+' ============================================================
+
+function GetCityIndex(index as integer) as integer
+
+    GetCityIndex = index mod gWeatherCities.size
+
+end function
+
+
+' ============================================================
+' COPY HIGHLIGHT SCROLL KEY
+' SAMA DENGAN SOCIAL
+' ============================================================
+
+sub copyKey()
+
+    dim dir as director
+    dim kf as keyframe
+    dim kf2 as keyframe
+
+    dir = GetParameterContainer("messageContainer").GetDirector()
+
+    kf = dir.findkeyframe("H1Scroll")
+    kf2 = dir.findkeyframe("H2Scroll")
+
+    kf.xyzvalue.y = kf2.xyzvalue.y
+
+    kf.updateanimation()
+    kf2.updateanimation()
+
+end sub
+
+
+' ============================================================
+' BUTTON ACTION
+' PERSIS FLOW SOCIAL
+' ============================================================
+
+sub OnExecAction(buttonId As Integer)
+
+    if buttonId = 0 then
+
+        Scene.Map["initloadlt"] = "init"
+
+        startShow()
+
+        dim dirm as director = messageContainer.getDirector()
+        dim dirt as director = timerContainer.getDirector()
+
+        dirt.startAnimation()
+
+        dirm.time = 0
+        dirm.stopAnimation()
+
+
+    elseif buttonId = 1 then
+
+        OnNextItemTransition()
+
+        dim dirm as director = messageContainer.getDirector()
+
+        dirm.time = 0
+        dirm.continueAnimation()
+
+        NextItem()
+
+
+    elseif buttonId = 2 then
+
+        dim dirm as director = messageContainer.getDirector()
+
+        dirm.time = 0
+        dirm.startAnimation()
+
+
+    elseif buttonId = 3 then
+
+        dim dirm as director = messageContainer.getDirector()
+        dim dirt as director = timerContainer.getDirector()
+
+        dirm.time = 0
+        dirm.stopAnimation()
+
+        dirt.time = 0
+        dirt.stopAnimation()
+
+    end if
+
+end sub
