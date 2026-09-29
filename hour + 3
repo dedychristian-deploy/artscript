@@ -1,0 +1,278 @@
+let editingIndex = -1
+const rowData = 10
+
+function refreshRows() {
+    try {
+        const raw = String(
+            vizrt.fields.$JSONContent.value || '{"data":[]}'
+        )
+
+        const json = JSON.parse(raw)
+        const data = json.data || []
+
+        for (let i = 0; i < rowData; i++) {
+            const row = (vizrt.fields as any)["$row" + i]
+            const display = (vizrt.fields as any)["$display" + i]
+            const item = data[i]
+
+            if (item) {
+                if (row) {
+                    row.value =
+                        (item.primaryTime || "") + " | " +
+                        (item.primaryHour || "") + " | " +
+                        (item.secondaryTime || "") + " | " +
+                        (item.secondaryHour || "") + " | " +
+                        (item.location || "") 
+                }
+
+                if (display) {
+                    display.value = "flex"
+                }
+            } else {
+                if (row) {
+                    row.value = ""
+                }
+
+                if (display) {
+                    display.value = "none"
+                }
+            }
+        }
+    } catch (e) {
+        console.log("REFRESH ERROR", e)
+    }
+}
+
+function saveItem() {
+    try {
+        const raw = String(
+            vizrt.fields.$JSONContent.value || '{"data":[]}'
+        )
+
+        const json = JSON.parse(raw)
+
+        if (!json.data) {
+            json.data = []
+        }
+
+        const item = {
+            primaryTime: String(
+                vizrt.fields.$primaryTime.value || ""
+            ),
+            primaryHour: String(
+                vizrt.fields.$primaryHour.value || ""
+            ),
+            secondaryTime: String(
+                vizrt.fields.$secondaryTime.value || ""
+            ),
+            secondaryHour: String(
+                vizrt.fields.$secondaryHour.value || ""
+            ),
+            content: String(
+                vizrt.fields.$content.value || ""
+            ),
+            location: String(
+                vizrt.fields.$location.value || ""
+            )
+        }
+
+        if (editingIndex >= 0) {
+            json.data[editingIndex] = item
+            editingIndex = -1
+        } else {
+            if (json.data.length >= rowData) {
+                console.log("MAX DATA = " + rowData)
+                return
+            }
+
+            json.data.push(item)
+        }
+
+        vizrt.fields.$JSONContent.value = JSON.stringify(json)
+
+        refreshRows()
+
+    } catch (e) {
+        console.log("SAVE ERROR", e)
+    }
+}
+
+function editItem(index: number) {
+    try {
+        const raw = String(
+            vizrt.fields.$JSONContent.value || '{"data":[]}'
+        )
+
+        const json = JSON.parse(raw)
+        const item = json.data[index]
+
+        if (!item) {
+            return
+        }
+
+        editingIndex = index
+
+        vizrt.fields.$primaryTime.value =
+            item.primaryTime || ""
+
+        vizrt.fields.$primaryHour.value =
+            item.primaryHour || ""
+
+        vizrt.fields.$secondaryTime.value =
+            item.secondaryTime || ""
+
+        vizrt.fields.$secondaryHour.value =
+            item.secondaryHour || ""
+
+        vizrt.fields.$content.value =
+            item.content || ""
+
+        vizrt.fields.$location.value =
+            item.location || ""
+
+    } catch (e) {
+        console.log("EDIT ERROR", e)
+    }
+}
+
+function deleteItem(index: number) {
+    try {
+        const raw = String(
+            vizrt.fields.$JSONContent.value || '{"data":[]}'
+        )
+
+        const json = JSON.parse(raw)
+
+        if (
+            !json.data ||
+            index < 0 ||
+            index >= json.data.length
+        ) {
+            return
+        }
+
+        json.data.splice(index, 1)
+
+        editingIndex = -1
+
+        vizrt.fields.$JSONContent.value =
+            JSON.stringify(json)
+
+        refreshRows()
+
+    } catch (e) {
+        console.log("DELETE ERROR", e)
+    }
+}
+
+function moveItem(index: number, direction: number) {
+    try {
+        const raw = String(
+            vizrt.fields.$JSONContent.value || '{"data":[]}'
+        )
+
+        const json = JSON.parse(raw)
+        const data = json.data || []
+
+        const targetIndex = index + direction
+
+        if (
+            targetIndex < 0 ||
+            targetIndex >= data.length
+        ) {
+            return
+        }
+
+        const temp = data[index]
+
+        data[index] = data[targetIndex]
+        data[targetIndex] = temp
+
+        editingIndex = -1
+
+        vizrt.fields.$JSONContent.value =
+            JSON.stringify(json)
+
+        refreshRows()
+
+    } catch (e) {
+        console.log("MOVE ERROR", e)
+    }
+}
+
+function updateSecondaryHour() {
+    const value = String(vizrt.fields.$primaryHour.value || "")
+
+    if (!value) {
+        vizrt.fields.$secondaryHour.value = ""
+        return
+    }
+
+    const parts = value.split(":")
+
+    if (parts.length < 2) {
+        return
+    }
+
+    let hour = Number(parts[0])
+    const minute = parts[1]
+
+    hour = hour + 3
+
+    if (hour >= 24) {
+        hour -= 24
+    }
+
+    vizrt.fields.$secondaryHour.value =
+        String(hour).padStart(2, "0") + ":" + minute
+}
+
+vizrt.onClick = (name: string) => {
+
+    if (name === "save") {
+        saveItem()
+        return
+    }
+
+    if (name.indexOf("edit_") === 0) {
+        editItem(
+            Number(name.replace("edit_", ""))
+        )
+        return
+    }
+
+    if (name.indexOf("delete_") === 0) {
+        deleteItem(
+            Number(name.replace("delete_", ""))
+        )
+        return
+    }
+
+    if (name.indexOf("up_") === 0) {
+        moveItem(
+            Number(name.replace("up_", "")),
+            -1
+        )
+        return
+    }
+
+    if (name.indexOf("down_") === 0) {
+        moveItem(
+            Number(name.replace("down_", "")),
+            1
+        )
+        return
+    }
+}
+
+vizrt.onCreate = () => {
+    refreshRows()
+}
+vizrt.fields.$primaryHour.onChanged = () => {
+    updateSecondaryHour()
+}
+vizrt.fields.$JSONContent.onChanged = () => {
+    refreshRows()
+}
+
+refreshRows()
