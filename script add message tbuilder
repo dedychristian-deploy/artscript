@@ -1,0 +1,259 @@
+let editingIndex = -1
+const rowData = 10
+
+function getData() {
+    const raw = String(vizrt.fields.$Message.value || "")
+
+    if (!raw.trim()) {
+        return []
+    }
+
+    return raw
+        .split(/\r?\n/)
+        .filter((item: string) => item.trim() !== "")
+}
+
+function setData(data: string[]) {
+    vizrt.fields.$Message.value = data.join("\n")
+}
+
+function refreshRows() {
+    try {
+        const data = getData()
+
+        for (let i = 0; i < rowData; i++) {
+            const row = (vizrt.fields as any)["$row" + i]
+            const display = (vizrt.fields as any)["$display" + i]
+
+            if (data[i] !== undefined) {
+                if (row) {
+                    row.value = data[i]
+                }
+
+                if (display) {
+                    display.value = "flex"
+                }
+            } else {
+                if (row) {
+                    row.value = ""
+                }
+
+                if (display) {
+                    display.value = "none"
+                }
+            }
+        }
+    } catch (e) {
+        console.log("REFRESH ERROR", e)
+    }
+}
+
+function saveItem() {
+    try {
+        const value = String(vizrt.fields.$MessageAdd.value || "").trim()
+
+        if (!value) {
+            return
+        }
+
+        const data = getData()
+
+        if (editingIndex >= 0) {
+            data[editingIndex] = value
+            editingIndex = -1
+        } else {
+            if (data.length >= rowData) {
+                console.log("MAX DATA = " + rowData)
+                return
+            }
+
+            data.push(value)
+        }
+
+        setData(data)
+
+        vizrt.fields.$MessageAdd.value = ""
+
+        refreshRows()
+    } catch (e) {
+        console.log("SAVE ERROR", e)
+    }
+}
+
+function editItem(index: number) {
+    try {
+        const data = getData()
+
+        if (data[index] === undefined) {
+            return
+        }
+
+        editingIndex = index
+
+        vizrt.fields.$MessageAdd.value = data[index]
+    } catch (e) {
+        console.log("EDIT ERROR", e)
+    }
+}
+
+function deleteItem(index: number) {
+    try {
+        const data = getData()
+
+        if (index < 0 || index >= data.length) {
+            return
+        }
+
+        data.splice(index, 1)
+
+        editingIndex = -1
+
+        setData(data)
+
+        vizrt.fields.$MessageAdd.value = ""
+
+        refreshRows()
+    } catch (e) {
+        console.log("DELETE ERROR", e)
+    }
+}
+
+function moveItem(index: number, direction: number) {
+    try {
+        const data = getData()
+        const targetIndex = index + direction
+
+        if (
+            index < 0 ||
+            index >= data.length ||
+            targetIndex < 0 ||
+            targetIndex >= data.length
+        ) {
+            return
+        }
+
+        const temp = data[index]
+
+        data[index] = data[targetIndex]
+        data[targetIndex] = temp
+
+        editingIndex = -1
+
+        setData(data)
+
+        vizrt.fields.$MessageAdd.value = ""
+
+        refreshRows()
+    } catch (e) {
+        console.log("MOVE ERROR", e)
+    }
+}
+
+vizrt.onClick = (name: string) => {
+    if (name === "save") {
+        saveItem()
+        return
+    }
+
+    if (name.indexOf("edit_") === 0) {
+        editItem(Number(name.replace("edit_", "")))
+        return
+    }
+
+    if (name.indexOf("delete_") === 0) {
+        deleteItem(Number(name.replace("delete_", "")))
+        return
+    }
+
+    if (name.indexOf("up_") === 0) {
+        moveItem(Number(name.replace("up_", "")), -1)
+        return
+    }
+
+    if (name.indexOf("down_") === 0) {
+        moveItem(Number(name.replace("down_", "")), 1)
+        return
+    }
+}
+
+vizrt.onCreate = () => {
+    refreshRows()
+}
+
+vizrt.fields.$Message.onChanged = () => {
+    refreshRows()
+}
+
+refreshRows()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="width:100%;">
+    <button vizrt-click-name="save" style="width:100%; padding:6px; margin-bottom:6px;">SAVE</button>
+
+    <div style="display:{{display0}};">
+        <div style="display:flex; align-items:center; gap:2px; padding:2px; font-size:12px;">
+            <button vizrt-click-name="up_0" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↑</button>
+            <button vizrt-click-name="down_0" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↓</button>
+            <button vizrt-click-name="delete_0" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">✕</button>
+            <button vizrt-click-name="edit_0" style="flex:none; width:36px; min-width:40px; padding:1px; font-size:12px;">EDIT</button>
+            <span style="white-space:nowrap; font-size:12px;">01&nbsp;&nbsp;{{row0}}</span>
+        </div>
+    </div>
+
+    <div style="display:{{display1}};">
+        <div style="display:flex; align-items:center; gap:2px; padding:2px; font-size:12px;">
+            <button vizrt-click-name="up_1" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↑</button>
+            <button vizrt-click-name="down_1" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↓</button>
+            <button vizrt-click-name="delete_1" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">✕</button>
+            <button vizrt-click-name="edit_1" style="flex:none; width:36px; min-width:40px; padding:1px; font-size:12px;">EDIT</button>
+            <span style="white-space:nowrap; font-size:12px;">02&nbsp;&nbsp;{{row1}}</span>
+        </div>
+    </div>
+
+    <div style="display:{{display2}};">
+        <div style="display:flex; align-items:center; gap:2px; padding:2px; font-size:12px;">
+            <button vizrt-click-name="up_2" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↑</button>
+            <button vizrt-click-name="down_2" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↓</button>
+            <button vizrt-click-name="delete_2" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">✕</button>
+            <button vizrt-click-name="edit_2" style="flex:none; width:36px; min-width:40px; padding:1px; font-size:12px;">EDIT</button>
+            <span style="white-space:nowrap; font-size:12px;">03&nbsp;&nbsp;{{row2}}</span>
+        </div>
+    </div>
+
+    <div style="display:{{display3}};">
+        <div style="display:flex; align-items:center; gap:2px; padding:2px; font-size:12px;">
+            <button vizrt-click-name="up_3" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↑</button>
+            <button vizrt-click-name="down_3" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↓</button>
+            <button vizrt-click-name="delete_3" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">✕</button>
+            <button vizrt-click-name="edit_3" style="flex:none; width:36px; min-width:40px; padding:1px; font-size:12px;">EDIT</button>
+            <span style="white-space:nowrap; font-size:12px;">04&nbsp;&nbsp;{{row3}}</span>
+        </div>
+    </div>
+
+    <div style="display:{{display4}};">
+        <div style="display:flex; align-items:center; gap:2px; padding:2px; font-size:12px;">
+            <button vizrt-click-name="up_4" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↑</button>
+            <button vizrt-click-name="down_4" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">↓</button>
+            <button vizrt-click-name="delete_4" style="flex:none; width:24px; min-width:24px; padding:1px; font-size:12px;">✕</button>
+            <button vizrt-click-name="edit_4" style="flex:none; width:36px; min-width:40px; padding:1px; font-size:12px;">EDIT</button>
+            <span style="white-space:nowrap; font-size:12px;">05&nbsp;&nbsp;{{row4}}</span>
+        </div>
+    </div>
+
+   
+</div>
+
+
